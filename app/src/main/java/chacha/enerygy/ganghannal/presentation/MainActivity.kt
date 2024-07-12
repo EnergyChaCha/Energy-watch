@@ -21,9 +21,23 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+<<<<<<< Updated upstream
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+=======
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.wear.compose.material.Button
+import androidx.wear.compose.material.ButtonDefaults
+import androidx.wear.compose.material.Icon
+>>>>>>> Stashed changes
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
@@ -53,13 +67,23 @@ fun MainApp(bpm: Int) {
             contentAlignment = Alignment.Center
         ) {
             TimeText()
-            Layout(bpm = bpm)
+            MainScreen(bpm = bpm)
         }
     }
 }
 
 @Composable
-fun Layout(bpm: Int) {
+fun MainScreen(bpm: Int) {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "BpmPage") {
+        composable("BpmPage") { Layout(navController, bpm) }
+        composable("notificationScreen") { NotificationScreen() }
+        composable("reportScreen") { ReportScreen() }
+    }
+}
+
+@Composable
+fun Layout(navController: NavHostController, bpm: Int) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -69,9 +93,15 @@ fun Layout(bpm: Int) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ) {
+<<<<<<< Updated upstream
             Alert()
             Spacer(modifier = Modifier.width(8.dp)) // Add space between texts
             Report()
+=======
+            Alert(navController)
+            Spacer(modifier = Modifier.width(12.dp))
+            Report(navController)
+>>>>>>> Stashed changes
 
         }
     }
@@ -88,6 +118,7 @@ fun BPMInfo(bpm: Int) {
 }
 
 @Composable
+<<<<<<< Updated upstream
 fun Alert() {
     Text(
         color = MaterialTheme.colors.primary,
@@ -102,3 +133,69 @@ fun Report() {
         text = "report"
     )
 }
+=======
+fun Alert(navController: NavHostController) {
+    ButtonUI(Icons.Default.Notifications, "알림", navController, "notificationScreen")
+}
+
+@Composable
+fun Report(navController: NavHostController) {
+    ButtonUI(Icons.Default.Sos, "신고", navController, "reportScreen")
+}
+
+@Composable
+fun ButtonUI(icon: ImageVector, text: String, navController: NavHostController, targetScreen: String) {
+    Button(
+        onClick = { navController.navigate(targetScreen) },
+        shape = CircleShape,
+        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
+        modifier = Modifier.size(72.dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = Color.White
+            )
+            Spacer(modifier = Modifier.width(4.dp)) // Add space between icon and text
+            Text(
+                text = text,
+                color = Color.White
+            )
+        }
+    }
+}
+
+
+
+@Composable
+fun NotificationScreen() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "This is the Notification Screen",
+            color = MaterialTheme.colors.primary
+        )
+    }
+}
+
+@Composable
+fun ReportScreen() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "This is the Report Screen",
+            color = MaterialTheme.colors.primary
+        )
+    }
+}
+>>>>>>> Stashed changes
