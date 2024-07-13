@@ -25,6 +25,7 @@ import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import chacha.enerygy.ganghannal.presentation.constant.NavigationRoute
 import chacha.enerygy.ganghannal.presentation.screen.main.MainScreen
+import chacha.enerygy.ganghannal.presentation.screen.notification.NotificationScreen
 import chacha.enerygy.ganghannal.presentation.theme.GangHanNalTheme
 
 class MainActivity : ComponentActivity() {
@@ -57,21 +58,6 @@ fun MainApp(bpm: Int) {
                 composable(NavigationRoute.REPORT.name) { ReportScreen() }
             }
         }
-    }
-}
-
-
-@Composable
-fun NotificationScreen() {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "This is the Notification Screen",
-            color = MaterialTheme.colors.primary
-        )
     }
 }
 
