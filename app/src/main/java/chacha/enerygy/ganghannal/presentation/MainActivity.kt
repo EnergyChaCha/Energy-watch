@@ -6,7 +6,6 @@
 
 package chacha.enerygy.ganghannal.presentation
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,33 +13,23 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Sos
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
-import androidx.wear.compose.material.TimeText
 import chacha.enerygy.ganghannal.presentation.component.CircleButton
+import chacha.enerygy.ganghannal.presentation.constant.NavigationRoute
+import chacha.enerygy.ganghannal.presentation.screen.main.MainScreen
 import chacha.enerygy.ganghannal.presentation.theme.GangHanNalTheme
 
 class MainActivity : ComponentActivity() {
@@ -68,9 +57,9 @@ fun MainApp(bpm: Int) {
         ) {
             val navController = rememberNavController()
             NavHost(navController = navController, startDestination = "mainScreen") {
-                composable("mainScreen") { MainScreen(navController, bpm) }
-                composable("notificationScreen") { NotificationScreen() }
-                composable("reportScreen") { ReportScreen() }
+                composable(NavigationRoute.MAIN.name) { MainScreen(navController, bpm) }
+                composable(NavigationRoute.NOTIFICATION.name) { NotificationScreen() }
+                composable(NavigationRoute.REPORT.name) { ReportScreen() }
             }
         }
     }
@@ -140,12 +129,17 @@ fun formatBPM(bpm: Int): String {
 
 @Composable
 fun Notification(navController: NavHostController) {
-    CircleButton(Icons.Default.Notifications, "알림", navController, "notificationScreen")
+    CircleButton(
+        Icons.Default.Notifications,
+        "알림",
+        navController,
+        NavigationRoute.NOTIFICATION.name
+    )
 }
 
 @Composable
 fun Report(navController: NavHostController) {
-    CircleButton(Icons.Default.Sos, "신고", navController, "reportScreen")
+    CircleButton(Icons.Default.Sos, "신고", navController, NavigationRoute.REPORT.name)
 }
 
 
