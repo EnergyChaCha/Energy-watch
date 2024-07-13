@@ -30,8 +30,7 @@ import androidx.wear.compose.material.TimeText
 import chacha.enerygy.ganghannal.presentation.component.CircleButton
 import chacha.enerygy.ganghannal.presentation.constant.NavigationRoute
 
-class MainScreen {
-}
+class MainScreen
 
 @Composable
 fun MainScreen(navController: NavHostController, bpm: Int) {
