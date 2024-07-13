@@ -65,67 +65,6 @@ fun MainApp(bpm: Int) {
     }
 }
 
-@Composable
-fun MainScreen(navController: NavHostController, bpm: Int) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colors.background),
-        contentAlignment = Alignment.Center
-    ) {
-        TimeText()
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            BPMInfo(bpm)
-            Spacer(modifier = Modifier.height(1.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Notification(navController)
-                Spacer(modifier = Modifier.width(12.dp))
-                Report(navController)
-            }
-        }
-    }
-}
-
-@Composable
-fun BPMInfo(bpm: Int) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically, // 중앙 선 맞추기
-        horizontalArrangement = Arrangement.Center, // 중앙에 모여있게 하기
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 12.dp) // Add padding to separate rows
-    ) {
-        Icon(
-            imageVector = Icons.Default.MonitorHeart,
-            contentDescription = null,
-            tint = Color.White,
-            modifier = Modifier.size(40.dp) // Set the icon size
-        )
-
-        Spacer(modifier = Modifier.width(4.dp))
-
-        val formatBPM = formatBPM(bpm)
-        Text(
-            color = MaterialTheme.colors.primary,
-            text = "$formatBPM BPM"
-        )
-    }
-}
-
-@SuppressLint("DefaultLocale")
-fun formatBPM(bpm: Int): String {
-    return if (bpm < 100) {
-        String.format("%3d", bpm)
-    } else {
-        bpm.toString()
-    }
-}
 
 @Composable
 fun Notification(navController: NavHostController) {
