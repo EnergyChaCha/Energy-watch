@@ -69,7 +69,6 @@ fun MainApp(bpm: Int) {
                 .background(MaterialTheme.colors.background),
             contentAlignment = Alignment.Center
         ) {
-            TimeText()
             val navController = rememberNavController()
             NavHost(navController = navController, startDestination = "mainScreen") {
                 composable("mainScreen") { MainScreen(navController, bpm) }
@@ -82,19 +81,27 @@ fun MainApp(bpm: Int) {
 
 @Composable
 fun MainScreen(navController: NavHostController, bpm: Int) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colors.background),
+        contentAlignment = Alignment.Center
     ) {
-        BPMInfo(bpm)
-        Spacer(modifier = Modifier.height(1.dp))
-        Row(
+        TimeText()
+        Column(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Alert(navController)
-            Spacer(modifier = Modifier.width(12.dp))
-            Report(navController)
+            BPMInfo(bpm)
+            Spacer(modifier = Modifier.height(1.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Alert(navController)
+                Spacer(modifier = Modifier.width(12.dp))
+                Report(navController)
+            }
         }
     }
 }
