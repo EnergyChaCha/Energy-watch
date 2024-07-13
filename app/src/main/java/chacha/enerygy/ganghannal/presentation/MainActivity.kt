@@ -70,23 +70,18 @@ fun MainApp(bpm: Int) {
             contentAlignment = Alignment.Center
         ) {
             TimeText()
-            MainScreen(bpm = bpm)
+            val navController = rememberNavController()
+            NavHost(navController = navController, startDestination = "mainScreen") {
+                composable("mainScreen") { MainScreen(navController, bpm) }
+                composable("notificationScreen") { NotificationScreen() }
+                composable("reportScreen") { ReportScreen() }
+            }
         }
     }
 }
 
 @Composable
-fun MainScreen(bpm: Int) {
-    val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "BpmPage") {
-        composable("BpmPage") { Layout(navController, bpm) }
-        composable("notificationScreen") { NotificationScreen() }
-        composable("reportScreen") { ReportScreen() }
-    }
-}
-
-@Composable
-fun Layout(navController: NavHostController, bpm: Int) {
+fun MainScreen(navController: NavHostController, bpm: Int) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
