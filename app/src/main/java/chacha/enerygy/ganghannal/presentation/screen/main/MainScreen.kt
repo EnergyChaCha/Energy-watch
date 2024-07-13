@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MonitorHeart
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Sos
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,8 +27,8 @@ import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
-import chacha.enerygy.ganghannal.presentation.Notification
-import chacha.enerygy.ganghannal.presentation.Report
+import chacha.enerygy.ganghannal.presentation.component.CircleButton
+import chacha.enerygy.ganghannal.presentation.constant.NavigationRoute
 
 class MainScreen {
 }
@@ -91,4 +93,19 @@ fun formatBPM(bpm: Int): String {
     } else {
         bpm.toString()
     }
+}
+
+@Composable
+fun Notification(navController: NavHostController) {
+    CircleButton(
+        Icons.Default.Notifications,
+        "알림",
+        navController,
+        NavigationRoute.NOTIFICATION.name
+    )
+}
+
+@Composable
+fun Report(navController: NavHostController) {
+    CircleButton(Icons.Default.Sos, "신고", navController, NavigationRoute.REPORT.name)
 }

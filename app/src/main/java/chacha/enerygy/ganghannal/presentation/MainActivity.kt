@@ -14,20 +14,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Sos
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
-import chacha.enerygy.ganghannal.presentation.component.CircleButton
 import chacha.enerygy.ganghannal.presentation.constant.NavigationRoute
 import chacha.enerygy.ganghannal.presentation.screen.main.MainScreen
 import chacha.enerygy.ganghannal.presentation.theme.GangHanNalTheme
@@ -63,22 +58,6 @@ fun MainApp(bpm: Int) {
             }
         }
     }
-}
-
-
-@Composable
-fun Notification(navController: NavHostController) {
-    CircleButton(
-        Icons.Default.Notifications,
-        "알림",
-        navController,
-        NavigationRoute.NOTIFICATION.name
-    )
-}
-
-@Composable
-fun Report(navController: NavHostController) {
-    CircleButton(Icons.Default.Sos, "신고", navController, NavigationRoute.REPORT.name)
 }
 
 
