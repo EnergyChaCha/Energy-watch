@@ -98,7 +98,7 @@ fun MainScreen(navController: NavHostController, bpm: Int) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                Alert(navController)
+                Notification(navController)
                 Spacer(modifier = Modifier.width(12.dp))
                 Report(navController)
             }
@@ -142,7 +142,7 @@ fun formatBPM(bpm: Int): String {
 }
 
 @Composable
-fun Alert(navController: NavHostController) {
+fun Notification(navController: NavHostController) {
     ButtonUI(Icons.Default.Notifications, "알림", navController, "notificationScreen")
 }
 
