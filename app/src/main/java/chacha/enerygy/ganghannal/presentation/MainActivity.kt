@@ -17,17 +17,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Sos
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-<<<<<<< Updated upstream
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-=======
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavHostController
@@ -37,7 +38,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.Icon
->>>>>>> Stashed changes
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
@@ -93,16 +93,9 @@ fun Layout(navController: NavHostController, bpm: Int) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ) {
-<<<<<<< Updated upstream
-            Alert()
-            Spacer(modifier = Modifier.width(8.dp)) // Add space between texts
-            Report()
-=======
             Alert(navController)
             Spacer(modifier = Modifier.width(12.dp))
             Report(navController)
->>>>>>> Stashed changes
-
         }
     }
 }
@@ -118,22 +111,6 @@ fun BPMInfo(bpm: Int) {
 }
 
 @Composable
-<<<<<<< Updated upstream
-fun Alert() {
-    Text(
-        color = MaterialTheme.colors.primary,
-        text = "alert"
-    )
-}
-
-@Composable
-fun Report() {
-    Text(
-        color = MaterialTheme.colors.primary,
-        text = "report"
-    )
-}
-=======
 fun Alert(navController: NavHostController) {
     ButtonUI(Icons.Default.Notifications, "알림", navController, "notificationScreen")
 }
@@ -144,7 +121,12 @@ fun Report(navController: NavHostController) {
 }
 
 @Composable
-fun ButtonUI(icon: ImageVector, text: String, navController: NavHostController, targetScreen: String) {
+fun ButtonUI(
+    icon: ImageVector,
+    text: String,
+    navController: NavHostController,
+    targetScreen: String
+) {
     Button(
         onClick = { navController.navigate(targetScreen) },
         shape = CircleShape,
@@ -168,7 +150,6 @@ fun ButtonUI(icon: ImageVector, text: String, navController: NavHostController, 
         }
     }
 }
-
 
 
 @Composable
@@ -198,4 +179,4 @@ fun ReportScreen() {
         )
     }
 }
->>>>>>> Stashed changes
+
