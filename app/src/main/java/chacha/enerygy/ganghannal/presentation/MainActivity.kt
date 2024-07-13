@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.filled.Notifications
@@ -31,19 +30,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.wear.compose.material.Button
-import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
+import chacha.enerygy.ganghannal.presentation.component.CircleButton
 import chacha.enerygy.ganghannal.presentation.theme.GangHanNalTheme
 
 class MainActivity : ComponentActivity() {
@@ -143,44 +140,14 @@ fun formatBPM(bpm: Int): String {
 
 @Composable
 fun Notification(navController: NavHostController) {
-    ButtonUI(Icons.Default.Notifications, "알림", navController, "notificationScreen")
+    CircleButton(Icons.Default.Notifications, "알림", navController, "notificationScreen")
 }
 
 @Composable
 fun Report(navController: NavHostController) {
-    ButtonUI(Icons.Default.Sos, "신고", navController, "reportScreen")
+    CircleButton(Icons.Default.Sos, "신고", navController, "reportScreen")
 }
 
-@Composable
-fun ButtonUI(
-    icon: ImageVector,
-    text: String,
-    navController: NavHostController,
-    targetScreen: String
-) {
-    Button(
-        onClick = { navController.navigate(targetScreen) },
-        shape = CircleShape,
-        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
-        modifier = Modifier.size(72.dp)
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = Color.White
-            )
-            Spacer(modifier = Modifier.width(4.dp)) // Add space between icon and text
-            Text(
-                text = text,
-                color = Color.White
-            )
-        }
-    }
-}
 
 @Composable
 fun NotificationScreen() {
