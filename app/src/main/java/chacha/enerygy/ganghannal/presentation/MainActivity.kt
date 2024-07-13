@@ -50,7 +50,7 @@ fun MainApp(bpm: Int) {
             contentAlignment = Alignment.Center
         ) {
             val navController = rememberNavController()
-            NavHost(navController = navController, startDestination = "mainScreen") {
+            NavHost(navController = navController, startDestination = NavigationRoute.MAIN.name) {
                 composable(NavigationRoute.MAIN.name) { MainScreen(navController, bpm) }
                 composable(NavigationRoute.NOTIFICATION.name) { NotificationScreen() }
                 composable(NavigationRoute.REPORT.name) { ReportScreen() }
