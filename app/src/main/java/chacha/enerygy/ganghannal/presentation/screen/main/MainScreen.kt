@@ -24,18 +24,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.wear.compose.material.Icon
-import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
 import chacha.enerygy.ganghannal.presentation.component.CircleButton
 import chacha.enerygy.ganghannal.presentation.constant.NavigationRoute
+import chacha.enerygy.ganghannal.presentation.theme.AppColor
+
 
 @Composable
 fun MainScreen(navController: NavHostController, bpm: Int) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colors.background),
+            .background(AppColor.background.color),
         contentAlignment = Alignment.Center
     ) {
         TimeText()
