@@ -24,6 +24,7 @@ import chacha.enerygy.ganghannal.presentation.constant.NavigationRoute
 import chacha.enerygy.ganghannal.presentation.screen.main.MainScreen
 import chacha.enerygy.ganghannal.presentation.screen.notification.NotificationScreen
 import chacha.enerygy.ganghannal.presentation.screen.report.ReportScreen
+import chacha.enerygy.ganghannal.presentation.theme.AppColor
 import chacha.enerygy.ganghannal.presentation.theme.GangHanNalTheme
 
 class MainActivity : ComponentActivity() {
@@ -35,13 +36,14 @@ class MainActivity : ComponentActivity() {
         setTheme(android.R.style.Theme_DeviceDefault)
 
         setContent {
-            MainApp(100)
+            MainApp(90)
         }
     }
 }
 
+@Preview
 @Composable
-fun MainApp(bpm: Int) {
+fun MainApp(bpm: Int = 90) {
     GangHanNalTheme {
         Box(
             modifier = Modifier
