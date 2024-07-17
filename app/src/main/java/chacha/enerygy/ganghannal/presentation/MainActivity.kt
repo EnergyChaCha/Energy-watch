@@ -15,15 +15,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.wear.compose.material.MaterialTheme
 import chacha.enerygy.ganghannal.presentation.constant.NavigationRoute
 import chacha.enerygy.ganghannal.presentation.screen.main.MainScreen
 import chacha.enerygy.ganghannal.presentation.screen.notification.NotificationScreen
 import chacha.enerygy.ganghannal.presentation.screen.report.ReportScreen
+import chacha.enerygy.ganghannal.presentation.theme.AppColor
 import chacha.enerygy.ganghannal.presentation.theme.GangHanNalTheme
 
 class MainActivity : ComponentActivity() {
@@ -35,18 +36,19 @@ class MainActivity : ComponentActivity() {
         setTheme(android.R.style.Theme_DeviceDefault)
 
         setContent {
-            MainApp(100)
+            MainApp(90)
         }
     }
 }
 
+@Preview
 @Composable
-fun MainApp(bpm: Int) {
+fun MainApp(bpm: Int = 90) {
     GangHanNalTheme {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colors.background),
+                .background(AppColor.background.color),
             contentAlignment = Alignment.Center
         ) {
             val navController = rememberNavController()
