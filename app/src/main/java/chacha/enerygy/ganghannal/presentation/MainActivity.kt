@@ -27,9 +27,11 @@ import chacha.enerygy.ganghannal.presentation.screen.report.ReportScreen
 import chacha.enerygy.ganghannal.presentation.theme.AppColor
 import chacha.enerygy.ganghannal.presentation.theme.GangHanNalTheme
 import chacha.enerygy.ganghannal.presentation.viewmodel.AdminViewModel
+import chacha.enerygy.ganghannal.presentation.viewmodel.MemberViewModel
 
 class MainActivity : ComponentActivity() {
     private val adminViewModel: AdminViewModel by viewModels()
+    private val memberViewModel: MemberViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
 
@@ -38,13 +40,13 @@ class MainActivity : ComponentActivity() {
         setTheme(android.R.style.Theme_DeviceDefault)
 
         setContent {
-            MainApp(90, adminViewModel)
+            MainApp(90, adminViewModel, memberViewModel)
         }
     }
 }
 
 @Composable
-fun MainApp(bpm: Int = 90, adminViewModel: AdminViewModel) {
+fun MainApp(bpm: Int = 90, adminViewModel: AdminViewModel, memberViewModel: MemberViewModel) {
     GangHanNalTheme {
         Box(
             modifier = Modifier
@@ -58,7 +60,7 @@ fun MainApp(bpm: Int = 90, adminViewModel: AdminViewModel) {
                 composable(NavigationRoute.NOTIFICATION.name) {
                     PagerScreen(adminViewModel)
                 }
-                composable(NavigationRoute.REPORT.name) { ReportScreen(adminViewModel) }
+                composable(NavigationRoute.REPORT.name) { ReportScreen(memberViewModel) }
             }
         }
     }
