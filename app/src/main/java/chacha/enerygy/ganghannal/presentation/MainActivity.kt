@@ -9,25 +9,27 @@ package chacha.enerygy.ganghannal.presentation
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import chacha.enerygy.ganghannal.presentation.constant.NavigationRoute
 import chacha.enerygy.ganghannal.presentation.screen.main.MainScreen
-import chacha.enerygy.ganghannal.presentation.screen.notification.NotificationScreen
+import chacha.enerygy.ganghannal.presentation.screen.notification.PagerScreen
 import chacha.enerygy.ganghannal.presentation.screen.report.ReportScreen
 import chacha.enerygy.ganghannal.presentation.theme.AppColor
 import chacha.enerygy.ganghannal.presentation.theme.GangHanNalTheme
+import chacha.enerygy.ganghannal.presentation.viewmodel.AdminViewModel
 
 class MainActivity : ComponentActivity() {
+    private val adminViewModel: AdminViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
 
@@ -36,14 +38,13 @@ class MainActivity : ComponentActivity() {
         setTheme(android.R.style.Theme_DeviceDefault)
 
         setContent {
-            MainApp(90)
+            MainApp(90, adminViewModel)
         }
     }
 }
 
-@Preview
 @Composable
-fun MainApp(bpm: Int = 90) {
+fun MainApp(bpm: Int = 90, adminViewModel: AdminViewModel) {
     GangHanNalTheme {
         Box(
             modifier = Modifier
@@ -54,8 +55,10 @@ fun MainApp(bpm: Int = 90) {
             val navController = rememberNavController()
             NavHost(navController = navController, startDestination = NavigationRoute.MAIN.name) {
                 composable(NavigationRoute.MAIN.name) { MainScreen(navController, bpm) }
-                composable(NavigationRoute.NOTIFICATION.name) { NotificationScreen() }
-                composable(NavigationRoute.REPORT.name) { ReportScreen() }
+                composable(NavigationRoute.NOTIFICATION.name) {
+                    PagerScreen(adminViewModel)
+                }
+                composable(NavigationRoute.REPORT.name) { ReportScreen(adminViewModel) }
             }
         }
     }
