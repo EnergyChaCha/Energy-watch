@@ -7,7 +7,6 @@
 package chacha.enerygy.ganghannal.presentation
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -28,16 +27,11 @@ import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.health.services.client.HealthServices
-import androidx.health.services.client.data.DataType
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import chacha.enerygy.ganghannal.data.heartrate.HeartRateMonitor
-import chacha.enerygy.ganghannal.data.heartrate.HeartRateService
 import chacha.enerygy.ganghannal.presentation.constant.NavigationRoute
 import chacha.enerygy.ganghannal.presentation.screen.main.MainScreen
 import chacha.enerygy.ganghannal.presentation.screen.notification.PagerScreen
@@ -46,13 +40,10 @@ import chacha.enerygy.ganghannal.presentation.theme.AppColor
 import chacha.enerygy.ganghannal.presentation.theme.GangHanNalTheme
 import chacha.enerygy.ganghannal.presentation.viewmodel.AdminViewModel
 import chacha.enerygy.ganghannal.presentation.viewmodel.MemberViewModel
-import kotlinx.coroutines.guava.await
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private val adminViewModel: AdminViewModel by viewModels()
     private val memberViewModel: MemberViewModel by viewModels()
-    var supportsHeartRate = false
     private val REQUEST_BODY_SENSORS_PERMISSION = 1
     private lateinit var heartRateMonitor: HeartRateMonitor
 
@@ -66,49 +57,37 @@ class MainActivity : ComponentActivity() {
 
 
         setContent {
-//            checkDataTypeAvailable()
             var heartRate by remember { mutableStateOf(0f) }
             LaunchedEffect(Unit) {
-
                 heartRateMonitor.onHeartRateChanged = { newHeartRate ->
                     heartRate = newHeartRate
                 }
-
-                // 서비스 시작
-//                val intent = Intent(this@MainActivity, HeartRateService::class.java)
-//                ContextCompat.startForegroundService(this@MainActivity, intent)
             }
-
-
-//            LaunchedEffect(Unit) {
-//                if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.BODY_SENSORS)
-//                    != PackageManager.PERMISSION_GRANTED) {
-//                    ActivityCompat.requestPermissions(this@MainActivity,
-//                        arrayOf(Manifest.permission.BODY_SENSORS),
-//                        REQUEST_BODY_SENSORS_PERMISSION)
-//                } else {
-//                    startHeartRateMonitoring { newHeartRate ->
-//                        heartRate = newHeartRate
-//                    }
-//                }
-//            }
-
 
             MainApp(heartRate, adminViewModel, memberViewModel)
         }
-// BODY_SENSORS 권한을 요청합니다
+
+        // BODY_SENSORS 권한을 요청합니다
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.BODY_SENSORS)
-            != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
                 arrayOf(Manifest.permission.BODY_SENSORS),
-                REQUEST_BODY_SENSORS_PERMISSION)
+                REQUEST_BODY_SENSORS_PERMISSION
+            )
         } else {
             startHeartRateMonitoring()
         }
 
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    @Deprecated("Deprecated in Java")
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_BODY_SENSORS_PERMISSION) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
@@ -132,14 +111,6 @@ class MainActivity : ComponentActivity() {
         heartRateMonitor.stopMonitoring()
     }
 
-    private fun checkDataTypeAvailable() {
-        val healthClient = HealthServices.getClient(this /*context*/)
-        val measureClient = healthClient.measureClient
-        lifecycleScope.launch {
-            val capabilities = measureClient.getCapabilitiesAsync().await()
-            supportsHeartRate = DataType.HEART_RATE_BPM in capabilities.supportedDataTypesMeasure
-        }
-    }
 }
 
 @Composable
