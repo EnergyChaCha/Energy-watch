@@ -98,12 +98,7 @@ class MainActivity : ComponentActivity() {
             permissionAgree = true
         }
 
-        // 권한 허용 했는지 확인
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BODY_SENSORS)
-            != PackageManager.PERMISSION_GRANTED
-        ){
-            permissionAgree = false
-        }
+
 
         // 브로드캐스트 리시버 등록
         registerReceiver(heartRateReceiver, IntentFilter("HeartRateUpdate"))
@@ -165,6 +160,7 @@ class MainActivity : ComponentActivity() {
                 // 권한이 거부되었을 때의 처리를 합니다
                 // 예를 들어, 사용자에게 권한이 필요하다는 메시지를 표시합니다
                 Log.i("권한", "권한 거부됨")
+                permissionAgree = false
             }
         }
     }
