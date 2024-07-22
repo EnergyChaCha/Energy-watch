@@ -7,6 +7,10 @@
 package chacha.enerygy.ganghannal.presentation
 
 import android.Manifest
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -24,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -32,6 +37,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.wear.compose.material.Text
 import chacha.enerygy.ganghannal.data.heartrate.HeartRateMonitor
+import chacha.enerygy.ganghannal.data.heartrate.HeartRateService
 import chacha.enerygy.ganghannal.presentation.constant.NavigationRoute
 import chacha.enerygy.ganghannal.presentation.screen.main.MainScreen
 import chacha.enerygy.ganghannal.presentation.screen.notification.PagerScreen
@@ -45,7 +51,16 @@ class MainActivity : ComponentActivity() {
     private val adminViewModel: AdminViewModel by viewModels()
     private val memberViewModel: MemberViewModel by viewModels()
     private val REQUEST_BODY_SENSORS_PERMISSION = 1
-    private lateinit var heartRateMonitor: HeartRateMonitor
+//    private lateinit var heartRateMonitor: HeartRateMonitor
+
+    private val heartRateReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val heartRate = intent?.getFloatExtra("heartRate", 0f) ?: 0f
+            onHeartRateUpdate(heartRate)
+        }
+    }
+
+    var onHeartRateUpdate: (Float) -> Unit = {}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -53,19 +68,6 @@ class MainActivity : ComponentActivity() {
 
         setTheme(android.R.style.Theme_DeviceDefault)
 
-        heartRateMonitor = HeartRateMonitor(applicationContext)
-
-
-        setContent {
-            var heartRate by remember { mutableStateOf(0f) }
-            LaunchedEffect(Unit) {
-                heartRateMonitor.onHeartRateChanged = { newHeartRate ->
-                    heartRate = newHeartRate
-                }
-            }
-
-            MainApp(heartRate, adminViewModel, memberViewModel)
-        }
 
         // BODY_SENSORS 권한을 요청합니다
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.BODY_SENSORS)
@@ -77,10 +79,38 @@ class MainActivity : ComponentActivity() {
                 REQUEST_BODY_SENSORS_PERMISSION
             )
         } else {
-            startHeartRateMonitoring()
+            startHeartRateService()
         }
 
+        // 브로드캐스트 리시버 등록
+        registerReceiver(heartRateReceiver, IntentFilter("HeartRateUpdate"))
+
+        setContent {
+            var heartRate by remember { mutableStateOf(0f) }
+            val context = LocalContext.current as MainActivity
+
+            // 심박수 업데이트를 처리하는 효과를 생성합니다
+            LaunchedEffect(Unit) {
+                context.onHeartRateUpdate = { newHeartRate ->
+                    heartRate = newHeartRate
+                    Log.i("심박수", heartRate.toString())
+                }
+            }
+
+            MainApp(heartRate, adminViewModel, memberViewModel)
+        }
+
+
+
     }
+
+    private fun startHeartRateService() {
+        Log.i("심박수", "startHeartRateService 함수 시작")
+        val intent = Intent(this, HeartRateService::class.java)
+        ContextCompat.startForegroundService(this, intent)
+        Log.i("심박수", "startHeartRateService 종료")
+    }
+
 
     @Deprecated("Deprecated in Java")
     override fun onRequestPermissionsResult(
@@ -92,8 +122,10 @@ class MainActivity : ComponentActivity() {
         if (requestCode == REQUEST_BODY_SENSORS_PERMISSION) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 // 권한이 부여되었으므로 심박수 모니터링을 시작합니다
-                startHeartRateMonitoring()
+//                startHeartRateMonitoring()
+                startHeartRateService()
             } else {
+
                 // 권한이 거부되었을 때의 처리를 합니다
                 // 예를 들어, 사용자에게 권한이 필요하다는 메시지를 표시합니다
                 Log.i("권한", "권한 거부됨")
@@ -101,21 +133,31 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun startHeartRateMonitoring() {
-        // 심박수 모니터링을 시작하는 로직을 여기에 추가합니다
-        heartRateMonitor.startMonitoring()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        heartRateMonitor.stopMonitoring()
-    }
+//    private fun startHeartRateMonitoring() {
+//        // 심박수 모니터링을 시작하는 로직을 여기에 추가합니다
+//        heartRateMonitor.startMonitoring()
+//    }
+//
+//    override fun onDestroy() {
+//        super.onDestroy()
+//        heartRateMonitor.stopMonitoring()
+//    }
 
 }
 
 @Composable
 fun MainApp(bpm: Float = 90.0F, adminViewModel: AdminViewModel, memberViewModel: MemberViewModel) {
     GangHanNalTheme {
+//        var heartRate by remember { mutableStateOf(0f) }
+//        val context = LocalContext.current as MainActivity
+//
+//        // 심박수 업데이트를 처리하는 효과를 생성합니다
+//        LaunchedEffect(context) {
+//            context.onHeartRateUpdate = { newHeartRate ->
+//                heartRate = newHeartRate
+//            }
+//        }
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -130,8 +172,6 @@ fun MainApp(bpm: Float = 90.0F, adminViewModel: AdminViewModel, memberViewModel:
                 }
                 composable(NavigationRoute.REPORT.name) { ReportScreen(memberViewModel) }
             }
-
-            Text(text = "Current Heart Rate: $bpm bpm")
         }
     }
 }

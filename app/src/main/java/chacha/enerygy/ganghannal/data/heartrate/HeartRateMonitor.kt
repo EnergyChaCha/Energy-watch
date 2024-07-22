@@ -5,6 +5,7 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.util.Log
 
 class HeartRateMonitor(context: Context) : SensorEventListener {
     private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -26,6 +27,7 @@ class HeartRateMonitor(context: Context) : SensorEventListener {
         if (event?.sensor?.type == Sensor.TYPE_HEART_RATE) {
             val heartRate = event.values[0]
             onHeartRateChanged?.invoke(heartRate)
+            Log.i("심박수", heartRate.toString())
         }
     }
 
