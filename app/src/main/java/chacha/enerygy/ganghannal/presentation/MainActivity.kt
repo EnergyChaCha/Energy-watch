@@ -7,6 +7,7 @@
 package chacha.enerygy.ganghannal.presentation
 
 import android.Manifest
+import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -19,7 +20,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -28,13 +33,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.wear.compose.material.Card
+import androidx.wear.compose.material.ChipDefaults
+import androidx.wear.compose.material.CompactChip
+import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import chacha.enerygy.ganghannal.data.heartrate.HeartRateMonitor
 import chacha.enerygy.ganghannal.data.heartrate.HeartRateService
@@ -51,7 +64,7 @@ class MainActivity : ComponentActivity() {
     private val adminViewModel: AdminViewModel by viewModels()
     private val memberViewModel: MemberViewModel by viewModels()
     private val REQUEST_BODY_SENSORS_PERMISSION = 1
-//    private lateinit var heartRateMonitor: HeartRateMonitor
+    var permissionAgree = false
 
     private val heartRateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -88,16 +101,30 @@ class MainActivity : ComponentActivity() {
         setContent {
             var heartRate by remember { mutableStateOf(0f) }
             val context = LocalContext.current as MainActivity
+            var isMonitoringStarted by remember { mutableStateOf(false) }
+            val heartRates = remember { mutableListOf<Float>() }
 
             // 심박수 업데이트를 처리하는 효과를 생성합니다
             LaunchedEffect(Unit) {
                 context.onHeartRateUpdate = { newHeartRate ->
-                    heartRate = newHeartRate
-                    Log.i("심박수", heartRate.toString())
+//                    heartRate = newHeartRate
+
+                    // 심박수 데이터 수집 및 최빈값 계산
+                    heartRates.add(newHeartRate)
+                    if (heartRates.size > 15) {
+                        heartRates.removeAt(0)
+                    }
+
+                    val mostFrequentHeartRate = heartRates.groupingBy { it }.eachCount().maxByOrNull { it.value }?.key ?: 0f
+                    heartRate = mostFrequentHeartRate
+
+                    // 모니터링 여부 반환
+                    if( !isMonitoringStarted && heartRate.toInt() > 0 ) isMonitoringStarted = true
+                    if( isMonitoringStarted && heartRate.toInt() == 0 ) isMonitoringStarted = false
                 }
             }
 
-            MainApp(heartRate, adminViewModel, memberViewModel)
+            MainApp(heartRate, adminViewModel, memberViewModel, isMonitoringStarted, permissionAgree)
         }
 
 
@@ -122,42 +149,20 @@ class MainActivity : ComponentActivity() {
         if (requestCode == REQUEST_BODY_SENSORS_PERMISSION) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 // 권한이 부여되었으므로 심박수 모니터링을 시작합니다
-//                startHeartRateMonitoring()
                 startHeartRateService()
+                permissionAgree = true
             } else {
-
                 // 권한이 거부되었을 때의 처리를 합니다
                 // 예를 들어, 사용자에게 권한이 필요하다는 메시지를 표시합니다
                 Log.i("권한", "권한 거부됨")
             }
         }
     }
-
-//    private fun startHeartRateMonitoring() {
-//        // 심박수 모니터링을 시작하는 로직을 여기에 추가합니다
-//        heartRateMonitor.startMonitoring()
-//    }
-//
-//    override fun onDestroy() {
-//        super.onDestroy()
-//        heartRateMonitor.stopMonitoring()
-//    }
-
 }
 
 @Composable
-fun MainApp(bpm: Float = 90.0F, adminViewModel: AdminViewModel, memberViewModel: MemberViewModel) {
+fun MainApp(bpm: Float = 90.0F, adminViewModel: AdminViewModel, memberViewModel: MemberViewModel, isMonitoringStarted: Boolean, permissionAgree: Boolean) {
     GangHanNalTheme {
-//        var heartRate by remember { mutableStateOf(0f) }
-//        val context = LocalContext.current as MainActivity
-//
-//        // 심박수 업데이트를 처리하는 효과를 생성합니다
-//        LaunchedEffect(context) {
-//            context.onHeartRateUpdate = { newHeartRate ->
-//                heartRate = newHeartRate
-//            }
-//        }
-
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -171,6 +176,82 @@ fun MainApp(bpm: Float = 90.0F, adminViewModel: AdminViewModel, memberViewModel:
                     PagerScreen(adminViewModel)
                 }
                 composable(NavigationRoute.REPORT.name) { ReportScreen(memberViewModel) }
+            }
+
+
+            // 권한
+            if (!permissionAgree) {
+                val context = LocalContext.current as MainActivity
+                Card(
+                    onClick = { /* 클릭 이벤트 처리 */ },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(4.dp),
+                    backgroundPainter = ColorPainter(MaterialTheme.colors.surface), // 배경 설정
+                    contentColor = MaterialTheme.colors.onSurface,
+                    shape = RoundedCornerShape(8.dp)
+                )
+                {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth()
+                    ){
+                        Text(
+                            text = "권한을 허용하지 않으면 사용할 수 없습니다.",
+                            color = AppColor.textWhite.color,
+                            fontSize = MaterialTheme.typography.body2.fontSize,
+                        )
+                        Text(
+                            text = "종료 버튼을 누르면 좋료합니다.",
+                            color = AppColor.textWhite.color,
+                            fontSize = MaterialTheme.typography.body2.fontSize,
+                        )
+                        CompactChip(onClick = {
+                            // 어플리케이션 종료
+                            context.finish() },
+                            colors = ChipDefaults.chipColors(AppColor.secondary.color),
+                            label = {
+                                Text(
+                                    text = "종료",
+                                    color = AppColor.textWhite.color,
+                                    fontSize = MaterialTheme.typography.title3.fontSize,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                        )
+                    }
+                }
+            }
+
+            // 시계 바르게 착용 알림
+            if (permissionAgree && !isMonitoringStarted) {
+                Card(
+                    onClick = { /* 클릭 이벤트 처리 */ },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(4.dp),
+                    backgroundPainter = ColorPainter(MaterialTheme.colors.surface), // 배경 설정
+                    contentColor = MaterialTheme.colors.onSurface,
+                    shape = RoundedCornerShape(8.dp)
+
+                )
+                {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth()
+                    ){
+                        Text(
+                            text = "심박수를 측정중입니다.",
+                            color = AppColor.textWhite.color,
+                            fontSize = MaterialTheme.typography.body2.fontSize,
+                        )
+                        Text(
+                            text = "워치를 올바르게 착용해 주세요.",
+                            color = AppColor.textWhite.color,
+                            fontSize = MaterialTheme.typography.body2.fontSize,
+                        )
+                    }
+                }
             }
         }
     }
