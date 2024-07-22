@@ -25,10 +25,10 @@ class MemberViewModel : ViewModel() {
     var birthDate by mutableStateOf("1990-02-02")
         private set
 
-    var minThreshold by mutableStateOf(40)
+    var minThreshold by mutableStateOf(40F)
         private set
 
-    var maxThreshold by mutableStateOf(130)
+    var maxThreshold by mutableStateOf(80F)
         private set
 
 
