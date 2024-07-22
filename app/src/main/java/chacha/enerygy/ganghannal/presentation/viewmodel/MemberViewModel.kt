@@ -1,4 +1,4 @@
-package chacha.enerygy.ganghannal.presentation.viewmodel
+package chacha.energy.ganghannal.presentation.viewmodel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

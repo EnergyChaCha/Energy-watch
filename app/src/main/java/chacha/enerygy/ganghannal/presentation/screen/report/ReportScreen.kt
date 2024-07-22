@@ -1,4 +1,4 @@
-package chacha.enerygy.ganghannal.presentation.screen.report
+package chacha.energy.ganghannal.presentation.screen.report
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,9 +33,9 @@ import androidx.wear.compose.material.CompactChip
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
-import chacha.enerygy.ganghannal.presentation.theme.AppColor
-import chacha.enerygy.ganghannal.presentation.viewmodel.AdminViewModel
-import chacha.enerygy.ganghannal.presentation.viewmodel.MemberViewModel
+import chacha.energy.ganghannal.presentation.theme.AppColor
+import chacha.energy.ganghannal.presentation.viewmodel.AdminViewModel
+import chacha.energy.ganghannal.presentation.viewmodel.MemberViewModel
 
 @Composable
 fun ReportScreen(memberViewModel: MemberViewModel) {

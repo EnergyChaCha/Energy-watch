@@ -1,4 +1,4 @@
-package chacha.enerygy.ganghannal.data.heartrate
+package chacha.energy.ganghannal.data.heartrate
 
 import android.content.Context
 import android.hardware.Sensor

@@ -1,4 +1,4 @@
-package chacha.enerygy.ganghannal.presentation.constant
+package chacha.energy.ganghannal.presentation.constant
 
 enum class NavigationRoute(val route: String) {
     MAIN("mainScreen"),

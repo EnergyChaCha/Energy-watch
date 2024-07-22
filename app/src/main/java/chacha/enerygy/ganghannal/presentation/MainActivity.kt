@@ -4,7 +4,7 @@
  * changes to the libraries and their usages.
  */
 
-package chacha.enerygy.ganghannal.presentation
+package chacha.energy.ganghannal.presentation
 
 import android.Manifest
 import android.content.BroadcastReceiver
@@ -43,20 +43,22 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.Card
 import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.CompactChip
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
-import chacha.enerygy.ganghannal.data.heartrate.HeartRateService
-import chacha.enerygy.ganghannal.presentation.constant.NavigationRoute
-import chacha.enerygy.ganghannal.presentation.screen.main.MainScreen
-import chacha.enerygy.ganghannal.presentation.screen.notification.PagerScreen
-import chacha.enerygy.ganghannal.presentation.screen.report.ReportScreen
-import chacha.enerygy.ganghannal.presentation.theme.AppColor
-import chacha.enerygy.ganghannal.presentation.theme.GangHanNalTheme
-import chacha.enerygy.ganghannal.presentation.viewmodel.AdminViewModel
-import chacha.enerygy.ganghannal.presentation.viewmodel.MemberViewModel
+import chacha.energy.ganghannal.data.heartrate.HeartRateService
+import chacha.energy.ganghannal.data.message.MessageService
+import chacha.energy.ganghannal.presentation.constant.NavigationRoute
+import chacha.energy.ganghannal.presentation.screen.main.MainScreen
+import chacha.energy.ganghannal.presentation.screen.notification.PagerScreen
+import chacha.energy.ganghannal.presentation.screen.report.ReportScreen
+import chacha.energy.ganghannal.presentation.theme.AppColor
+import chacha.energy.ganghannal.presentation.theme.GangHanNalTheme
+import chacha.energy.ganghannal.presentation.viewmodel.AdminViewModel
+import chacha.energy.ganghannal.presentation.viewmodel.MemberViewModel
 
 class MainActivity : ComponentActivity() {
     private val adminViewModel: AdminViewModel by viewModels()

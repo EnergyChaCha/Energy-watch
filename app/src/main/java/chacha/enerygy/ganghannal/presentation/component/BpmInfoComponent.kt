@@ -1,4 +1,4 @@
-package chacha.enerygy.ganghannal.presentation.component
+package chacha.energy.ganghannal.presentation.component
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
@@ -20,9 +20,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
-import chacha.enerygy.ganghannal.presentation.icons.MyIconPack
-import chacha.enerygy.ganghannal.presentation.icons.myiconpack.EcgHeart
-import chacha.enerygy.ganghannal.presentation.theme.AppColor
+import chacha.energy.ganghannal.presentation.icons.MyIconPack
+import chacha.energy.ganghannal.presentation.icons.myiconpack.EcgHeart
+import chacha.energy.ganghannal.presentation.theme.AppColor
 
 
 @Preview

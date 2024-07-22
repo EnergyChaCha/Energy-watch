@@ -1,4 +1,4 @@
-package chacha.enerygy.ganghannal.presentation.screen.main
+package chacha.energy.ganghannal.presentation.screen.main
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -19,10 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.wear.compose.material.TimeText
-import chacha.enerygy.ganghannal.presentation.component.BpmInfoHorizontal
-import chacha.enerygy.ganghannal.presentation.component.CircleButton
-import chacha.enerygy.ganghannal.presentation.constant.NavigationRoute
-import chacha.enerygy.ganghannal.presentation.theme.AppColor
+import chacha.energy.ganghannal.presentation.component.BpmInfoHorizontal
+import chacha.energy.ganghannal.presentation.component.CircleButton
+import chacha.energy.ganghannal.presentation.constant.NavigationRoute
+import chacha.energy.ganghannal.presentation.theme.AppColor
 
 
 @Composable

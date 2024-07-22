@@ -1,4 +1,4 @@
-package chacha.enerygy.ganghannal.presentation.screen.notification
+package chacha.energy.ganghannal.presentation.screen.notification
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -22,9 +22,9 @@ import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
-import chacha.enerygy.ganghannal.presentation.component.NotificationItem
-import chacha.enerygy.ganghannal.presentation.component.PageIndecator
-import chacha.enerygy.ganghannal.presentation.theme.AppColor
+import chacha.energy.ganghannal.presentation.component.NotificationItem
+import chacha.energy.ganghannal.presentation.component.PageIndecator
+import chacha.energy.ganghannal.presentation.theme.AppColor
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

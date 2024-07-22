@@ -1,4 +1,4 @@
-package chacha.enerygy.ganghannal.presentation.component
+package chacha.energy.ganghannal.presentation.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,7 +16,7 @@ import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.Text
-import chacha.enerygy.ganghannal.presentation.theme.AppColor
+import chacha.energy.ganghannal.presentation.theme.AppColor
 
 @Composable
 fun CircleButton(

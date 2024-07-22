@@ -1,4 +1,4 @@
-package chacha.enerygy.ganghannal.presentation.component
+package chacha.energy.ganghannal.presentation.component
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
