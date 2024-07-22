@@ -21,7 +21,7 @@ import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 
 @Composable
-fun NotificationItem(bpm: Int, notification: String, dateTime: String) {
+fun NotificationItem(bpm: Float, notification: String, dateTime: String) {
     Card(
         onClick = { /* 클릭 이벤트 처리 */ },
         modifier = Modifier

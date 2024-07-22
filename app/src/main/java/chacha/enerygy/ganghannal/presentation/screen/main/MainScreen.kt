@@ -26,7 +26,7 @@ import chacha.enerygy.ganghannal.presentation.theme.AppColor
 
 
 @Composable
-fun MainScreen(navController: NavHostController, bpm: Int) {
+fun MainScreen(navController: NavHostController, bpm: Float) {
     Box(
         modifier = Modifier
             .fillMaxSize()

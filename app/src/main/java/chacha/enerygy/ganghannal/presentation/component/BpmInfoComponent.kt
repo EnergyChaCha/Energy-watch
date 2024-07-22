@@ -27,7 +27,7 @@ import chacha.enerygy.ganghannal.presentation.theme.AppColor
 
 @Preview
 @Composable
-fun BpmInfoHorizontal(bpm: Int = 90) {
+fun BpmInfoHorizontal(bpm: Float = 90F) {
     Row(
         verticalAlignment = Alignment.CenterVertically, // 중앙 선 맞추기
         horizontalArrangement = Arrangement.Center, // 중앙에 모여있게 하기
@@ -48,7 +48,7 @@ fun BpmInfoHorizontal(bpm: Int = 90) {
 
 @Preview
 @Composable
-fun BpmInfoVertical(bpm: Int = 90) {
+fun BpmInfoVertical(bpm: Float = 90F) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -75,7 +75,7 @@ fun BpmIcon(size: Double) {
 }
 
 @Composable
-fun bpmNumberText(bpm: Int = 90, size: Double): AnnotatedString {
+fun bpmNumberText(bpm: Float = 90F, size: Double): AnnotatedString {
     val zeros = getLeadingZeros(bpm)
     val annotatedString = buildAnnotatedString {
         append(
@@ -91,7 +91,7 @@ fun bpmNumberText(bpm: Int = 90, size: Double): AnnotatedString {
 
         append(
             AnnotatedString(
-                text = "$bpm",
+                text = bpm.toInt().toString(),
                 spanStyle = SpanStyle(
                     color = AppColor.textWhite.color,
                     fontWeight = FontWeight.SemiBold,
@@ -128,11 +128,11 @@ fun formatBpmText(bpm: Int): String {
     }
 }
 
-fun getLeadingZeros(number: Int): String {
+fun getLeadingZeros(number: Float): String {
     return when {
-        number in 100..999 -> ""
-        number in 10..99 -> "0"
-        number in 0..9 -> "00"
+        number.toInt() in 100..999 -> ""
+        number.toInt() in 10..99 -> "0"
+        number.toInt() in 0..9 -> "00"
         else -> ""
     }
 }
