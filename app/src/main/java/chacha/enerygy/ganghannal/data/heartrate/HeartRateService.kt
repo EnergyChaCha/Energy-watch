@@ -1,5 +1,6 @@
 package chacha.enerygy.ganghannal.data.heartrate
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -14,6 +15,7 @@ import androidx.core.app.NotificationCompat
 class HeartRateService : Service() {
     private lateinit var heartRateMonitor: HeartRateMonitor
 
+    @SuppressLint("ForegroundServiceType")
     override fun onCreate() {
         super.onCreate()
 

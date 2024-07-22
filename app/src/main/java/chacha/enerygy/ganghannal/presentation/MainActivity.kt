@@ -19,6 +19,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -64,7 +66,7 @@ class MainActivity : ComponentActivity() {
     private val adminViewModel: AdminViewModel by viewModels()
     private val memberViewModel: MemberViewModel by viewModels()
     private val REQUEST_BODY_SENSORS_PERMISSION = 1
-    var permissionAgree = false
+    var permissionAgree = true
 
     private val heartRateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -93,6 +95,14 @@ class MainActivity : ComponentActivity() {
             )
         } else {
             startHeartRateService()
+            permissionAgree = true
+        }
+
+        // 권한 허용 했는지 확인
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BODY_SENSORS)
+            != PackageManager.PERMISSION_GRANTED
+        ){
+            permissionAgree = false
         }
 
         // 브로드캐스트 리시버 등록
@@ -111,7 +121,7 @@ class MainActivity : ComponentActivity() {
 
                     // 심박수 데이터 수집 및 최빈값 계산
                     heartRates.add(newHeartRate)
-                    if (heartRates.size > 15) {
+                    if (heartRates.size > 10) {
                         heartRates.removeAt(0)
                     }
 
@@ -165,7 +175,7 @@ fun MainApp(bpm: Float = 90.0F, adminViewModel: AdminViewModel, memberViewModel:
     GangHanNalTheme {
         Box(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .background(AppColor.background.color),
             contentAlignment = Alignment.Center
         ) {
@@ -186,7 +196,7 @@ fun MainApp(bpm: Float = 90.0F, adminViewModel: AdminViewModel, memberViewModel:
                     onClick = { /* 클릭 이벤트 처리 */ },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(4.dp),
+                        .padding(horizontal = 20.dp, vertical = 4.dp),
                     backgroundPainter = ColorPainter(MaterialTheme.colors.surface), // 배경 설정
                     contentColor = MaterialTheme.colors.onSurface,
                     shape = RoundedCornerShape(8.dp)
@@ -194,15 +204,29 @@ fun MainApp(bpm: Float = 90.0F, adminViewModel: AdminViewModel, memberViewModel:
                 {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
                         modifier = Modifier.fillMaxWidth()
+
                     ){
                         Text(
-                            text = "권한을 허용하지 않으면 사용할 수 없습니다.",
+                            text = "심박수 측정을 위한",
+                            color = AppColor.textWhite.color,
+                            fontSize = MaterialTheme.typography.body2.fontSize,
+                            overflow = TextOverflow.Visible
+                        )
+                        Text(
+                            text = "센서 권한이 없습니다.",
+                            color = AppColor.textWhite.color,
+                            fontSize = MaterialTheme.typography.body2.fontSize,
+                            overflow = TextOverflow.Visible
+                        )
+                        Text(
+                            text = "설정에서 센서 권한을",
                             color = AppColor.textWhite.color,
                             fontSize = MaterialTheme.typography.body2.fontSize,
                         )
                         Text(
-                            text = "종료 버튼을 누르면 좋료합니다.",
+                            text = "허용 바랍니다.",
                             color = AppColor.textWhite.color,
                             fontSize = MaterialTheme.typography.body2.fontSize,
                         )
@@ -229,7 +253,7 @@ fun MainApp(bpm: Float = 90.0F, adminViewModel: AdminViewModel, memberViewModel:
                     onClick = { /* 클릭 이벤트 처리 */ },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(4.dp),
+                        .padding(horizontal = 20.dp, vertical = 4.dp),
                     backgroundPainter = ColorPainter(MaterialTheme.colors.surface), // 배경 설정
                     contentColor = MaterialTheme.colors.onSurface,
                     shape = RoundedCornerShape(8.dp)
@@ -237,11 +261,16 @@ fun MainApp(bpm: Float = 90.0F, adminViewModel: AdminViewModel, memberViewModel:
                 )
                 {
                     Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
+//                        horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.fillMaxWidth()
                     ){
                         Text(
                             text = "심박수를 측정중입니다.",
+                            color = AppColor.textWhite.color,
+                            fontSize = MaterialTheme.typography.body2.fontSize,
+                        )
+                        Text(
+                            text = "10초 정도 소요됩니다.",
                             color = AppColor.textWhite.color,
                             fontSize = MaterialTheme.typography.body2.fontSize,
                         )
