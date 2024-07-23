@@ -68,6 +68,7 @@ class MainActivity : ComponentActivity() {
 
     private var lastNotificationTime: Long = 0
     private val notificationCooldown: Long = 1000 * 60 * 5// 5분 (밀리초 단위)
+    private lateinit var  messageService: MessageService
 
 
     private val heartRateReceiver = object : BroadcastReceiver() {
@@ -84,6 +85,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setTheme(android.R.style.Theme_DeviceDefault)
+
 
 
         // BODY_SENSORS 권한을 요청합니다
@@ -110,6 +112,7 @@ class MainActivity : ComponentActivity() {
             var isMonitoringStarted by remember { mutableStateOf(false) }
             val heartRates = remember { mutableListOf<Float>() }
             val heartRatesToSave = remember { mutableListOf<Float>() }
+            messageService = MessageService(context)
 
             // 심박수 업데이트를 처리하는 효과를 생성합니다
             LaunchedEffect(Unit) {
@@ -147,8 +150,6 @@ class MainActivity : ComponentActivity() {
                         } else{
 //                            Log.i("심박수 저장 - 임계치 초과", "아직 시간 안 지남")
                         }
-
-
                     }
 
                     // 2분동안의 최빈값 저장 (0이 아닌 경우에만)
@@ -174,7 +175,8 @@ class MainActivity : ComponentActivity() {
                 adminViewModel,
                 memberViewModel,
                 isMonitoringStarted,
-                permissionAgree
+                permissionAgree,
+                messageService
             )
         }
     }
@@ -223,7 +225,8 @@ fun MainApp(
     adminViewModel: AdminViewModel,
     memberViewModel: MemberViewModel,
     isMonitoringStarted: Boolean,
-    permissionAgree: Boolean
+    permissionAgree: Boolean,
+    messageService: MessageService
 ) {
     GangHanNalTheme {
         Box(
@@ -239,6 +242,15 @@ fun MainApp(
                     PagerScreen(adminViewModel)
                 }
                 composable(NavigationRoute.REPORT.name) { ReportScreen(memberViewModel) }
+            }
+
+            Button(onClick = {
+                messageService.sendMessageToApp("/hello", "안녕 wearos 메시지야 sendMessageToApp")
+                Log.i("메시지", "전송 완료 sendMessageToApp")
+                messageService.sendMessage("/world", "안녕 wearos 메시지야 sendMessage")
+                Log.i("메시지", "전송 완료 sendMessage")
+            }) {
+                Text(text = "클릭하면 메시지 보냄")
             }
 
 
@@ -301,41 +313,43 @@ fun MainApp(
                 }
             }
 
-            // 시계 바르게 착용 알림
-            if (permissionAgree && !isMonitoringStarted) {
-                Card(
-                    onClick = { /* 클릭 이벤트 처리 */ },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 4.dp),
-                    backgroundPainter = ColorPainter(MaterialTheme.colors.surface), // 배경 설정
-                    contentColor = MaterialTheme.colors.onSurface,
-                    shape = RoundedCornerShape(8.dp)
 
-                )
-                {
-                    Column(
-//                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = "심박수를 측정중입니다.",
-                            color = AppColor.textWhite.color,
-                            fontSize = MaterialTheme.typography.body2.fontSize,
-                        )
-                        Text(
-                            text = "10초 정도 소요됩니다.",
-                            color = AppColor.textWhite.color,
-                            fontSize = MaterialTheme.typography.body2.fontSize,
-                        )
-                        Text(
-                            text = "워치를 올바르게 착용해 주세요.",
-                            color = AppColor.textWhite.color,
-                            fontSize = MaterialTheme.typography.body2.fontSize,
-                        )
-                    }
-                }
-            }
+            // TODO: 나중에 주석 해제
+//            // 시계 바르게 착용 알림
+//            if (permissionAgree && !isMonitoringStarted) {
+//                Card(
+//                    onClick = { /* 클릭 이벤트 처리 */ },
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(horizontal = 20.dp, vertical = 4.dp),
+//                    backgroundPainter = ColorPainter(MaterialTheme.colors.surface), // 배경 설정
+//                    contentColor = MaterialTheme.colors.onSurface,
+//                    shape = RoundedCornerShape(8.dp)
+//
+//                )
+//                {
+//                    Column(
+////                        horizontalAlignment = Alignment.CenterHorizontally,
+//                        modifier = Modifier.fillMaxWidth()
+//                    ) {
+//                        Text(
+//                            text = "심박수를 측정중입니다.",
+//                            color = AppColor.textWhite.color,
+//                            fontSize = MaterialTheme.typography.body2.fontSize,
+//                        )
+//                        Text(
+//                            text = "10초 정도 소요됩니다.",
+//                            color = AppColor.textWhite.color,
+//                            fontSize = MaterialTheme.typography.body2.fontSize,
+//                        )
+//                        Text(
+//                            text = "워치를 올바르게 착용해 주세요.",
+//                            color = AppColor.textWhite.color,
+//                            fontSize = MaterialTheme.typography.body2.fontSize,
+//                        )
+//                    }
+//                }
+//            }
         }
     }
 }

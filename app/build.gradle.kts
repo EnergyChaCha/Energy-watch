@@ -1,14 +1,17 @@
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
 }
 
 android {
-    namespace = "chacha.enerygy.ganghannal"
+
+
+    namespace = "chacha.energy.ganghannal"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "chacha.enerygy.ganghannal"
+        applicationId = "chacha.energy.ganghannal"
         minSdk = 30
         targetSdk = 34
         versionCode = 1
@@ -16,7 +19,21 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+    }
 
+    signingConfigs {
+        getByName("debug") {
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+        }
+        create("release") {
+            keyAlias = "release"
+            keyPassword = "my release key password"
+            storeFile = file("/home/miles/keystore.jks")
+            storePassword = "my keystore password"
+        }
     }
 
     buildTypes {
@@ -26,6 +43,17 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+
+        getByName("release") {
+            isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.getByName("release")
+            isDebuggable = false
+        }
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("debug")
+            isDebuggable = true
         }
     }
     compileOptions {
@@ -80,4 +108,10 @@ dependencies {
     implementation("androidx.concurrent:concurrent-futures:1.2.0")
     // Kotlin
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.6.0")
+
+    // Wearable Data Layer API
+    implementation ("com.google.android.gms:play-services-wearable:17.1.0")
+
+    //Gson
+    implementation ("com.google.code.gson:gson:2.10.1")
 }
