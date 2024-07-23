@@ -21,29 +21,10 @@ class MessageService(private val context: Context) {
     private val nodeClient = Wearable.getNodeClient(context)
 
     fun sendMessage(path: String, message: String){
-        val data = Hello(message)
+        val data = message
         val gson = Gson()
         val dataJson = gson.toJson(data)
         val sendData = dataJson.toByteArray(Charsets.UTF_8)
-
-//        CoroutineScope(Dispatchers.Default).launch {
-//            try{
-//                val nodes = capabilityClient.getCapability("mobile" , CapabilityClient.FILTER_REACHABLE).await().nodes
-//
-//                if(nodes.size == 0){
-//                    Log.d("tag" , "The node Size is 0")
-//                }
-//                nodes.map {node ->
-//                    async {
-//                        Log.d("tag", "data send $data")
-//                        messageClient.sendMessage(node.id ,"Define.MESSAGE_URL" , sendData )
-//                    }
-//                }.awaitAll()
-//            }catch (e : Exception){
-//                Log.d("tag" , "Error to send Data_wear")
-//            }
-//        }
-
 
         CoroutineScope(Dispatchers.Default).launch {
             try {

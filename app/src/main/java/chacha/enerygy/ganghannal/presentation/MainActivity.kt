@@ -60,6 +60,9 @@ import chacha.energy.ganghannal.presentation.theme.GangHanNalTheme
 import chacha.energy.ganghannal.presentation.viewmodel.AdminViewModel
 import chacha.energy.ganghannal.presentation.viewmodel.MemberViewModel
 import chacha.enerygy.ganghannal.data.message.dto.Hello
+import chacha.enerygy.ganghannal.data.message.dto.MemberInfo
+import chacha.enerygy.ganghannal.data.message.dto.Message
+import chacha.enerygy.ganghannal.data.message.dto.Order
 import com.google.android.gms.wearable.Wearable
 import com.google.gson.Gson
 
@@ -68,6 +71,7 @@ class MainActivity : ComponentActivity() {
     private val memberViewModel: MemberViewModel by viewModels()
     private val REQUEST_BODY_SENSORS_PERMISSION = 1
     var permissionAgree = true
+    var haveMemberInfo by mutableStateOf(false)
 
     private var lastNotificationTime: Long = 0
     private val notificationCooldown: Long = 1000 * 60 * 5// 5분 (밀리초 단위)
@@ -92,8 +96,27 @@ class MainActivity : ComponentActivity() {
         Wearable.getMessageClient(this).addListener { event ->
             val dataString = String(event.data, Charsets.UTF_8)
             val gson = Gson()
-            val dataObject = gson.fromJson(dataString, Hello::class.java)
-            Log.i("메시지", "메인 액티비티 메시지 받음: ${event.path} ${dataObject.toString()}")
+
+
+            Log.i("메시지", "워치 메시지 받음: ${event.path} ${dataString}")
+
+            if (event.path.equals(Order.HELLO.name)) {
+                val dataObject = gson.fromJson(dataString, Hello::class.java)
+                Log.i("메시지", "${Order.HELLO.name} 겟 ${dataObject.toString()}")
+            } else if(event.path.equals(Order.MEMBER_INFO.name)) {
+                val dataObject = gson.fromJson(dataString, MemberInfo::class.java)
+                Log.i("메시지", "${Order.MEMBER_INFO.name} 겟 ${dataObject.toString()}")
+                haveMemberInfo = true
+                memberViewModel.name = dataObject.name
+                memberViewModel.loginId = dataObject.loginId
+                memberViewModel.workArea = dataObject.workArea
+                memberViewModel.department = dataObject.department
+                memberViewModel.gender = dataObject.gender
+                memberViewModel.birthDate = dataObject.birthDate
+                memberViewModel.minThreshold = dataObject.minThreshold
+                memberViewModel.maxThreshold = dataObject.maxThreshold
+                adminViewModel.isAdmin = dataObject.isAdmin
+            }
         }
 
 
@@ -121,6 +144,7 @@ class MainActivity : ComponentActivity() {
             var isMonitoringStarted by remember { mutableStateOf(false) }
             val heartRates = remember { mutableListOf<Float>() }
             val heartRatesToSave = remember { mutableListOf<Float>() }
+            val haveMemberInfoContent = remember{haveMemberInfo}
             messageService = MessageService(context)
 
             // 심박수 업데이트를 처리하는 효과를 생성합니다
@@ -185,7 +209,8 @@ class MainActivity : ComponentActivity() {
                 memberViewModel,
                 isMonitoringStarted,
                 permissionAgree,
-                messageService
+                messageService,
+                haveMemberInfoContent
             )
         }
     }
@@ -235,7 +260,8 @@ fun MainApp(
     memberViewModel: MemberViewModel,
     isMonitoringStarted: Boolean,
     permissionAgree: Boolean,
-    messageService: MessageService
+    messageService: MessageService,
+    haveMemberInfo: Boolean
 ) {
     GangHanNalTheme {
         Box(
@@ -254,14 +280,13 @@ fun MainApp(
             }
 
             Button(onClick = {
-                messageService.sendMessageToApp("/hello", "안녕 wearos 메시지야 sendMessageToApp")
-                Log.i("메시지", "전송 완료 sendMessageToApp")
-                messageService.sendMessage("/world", "안녕 wearos 메시지야 sendMessage")
-                Log.i("메시지", "전송 완료 sendMessage")
+//                messageService.sendMessageToApp("/hello", "안녕 wearos 메시지야 sendMessageToApp")
+//                Log.i("메시지", "전송 완료 sendMessageToApp")
+                messageService.sendMessage("/world", "안녕 나는 wearos에서 보낸 메시지야")
+                Log.i("메시지", "전송 완료")
             }) {
                 Text(text = "클릭하면 메시지 보냄")
             }
-
 
             // 권한
             if (!permissionAgree) {
