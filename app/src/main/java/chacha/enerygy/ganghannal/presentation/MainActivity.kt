@@ -59,6 +59,9 @@ import chacha.energy.ganghannal.presentation.theme.AppColor
 import chacha.energy.ganghannal.presentation.theme.GangHanNalTheme
 import chacha.energy.ganghannal.presentation.viewmodel.AdminViewModel
 import chacha.energy.ganghannal.presentation.viewmodel.MemberViewModel
+import chacha.enerygy.ganghannal.data.message.dto.Hello
+import com.google.android.gms.wearable.Wearable
+import com.google.gson.Gson
 
 class MainActivity : ComponentActivity() {
     private val adminViewModel: AdminViewModel by viewModels()
@@ -86,6 +89,12 @@ class MainActivity : ComponentActivity() {
 
         setTheme(android.R.style.Theme_DeviceDefault)
 
+        Wearable.getMessageClient(this).addListener { event ->
+            val dataString = String(event.data, Charsets.UTF_8)
+            val gson = Gson()
+            val dataObject = gson.fromJson(dataString, Hello::class.java)
+            Log.i("메시지", "메인 액티비티 메시지 받음: ${event.path} ${dataObject.toString()}")
+        }
 
 
         // BODY_SENSORS 권한을 요청합니다
