@@ -29,10 +29,14 @@ class MessageService(private val context: Context) {
         CoroutineScope(Dispatchers.Default).launch {
             try {
                 val nodes = Tasks.await(nodeClient.connectedNodes)
-                nodes.forEach { node ->
-                    val result = Tasks.await(messageClient.sendMessage(node.id, path, sendData))
-                    Log.i("메시지 보내기 1", message.toString())
-                }
+//                nodes.forEach { node ->
+//                    val result = Tasks.await(messageClient.sendMessage(node.id, path, message.toByteArray()))
+//                    Log.i("메시지 보내기 1", message.toString())
+//                }
+                val node = nodes.get(0);
+                val result = Tasks.await(messageClient.sendMessage(node.id, path, message.toByteArray()))
+                Log.i("메시지 보내기 1", message.toString())
+
             } catch (e: Exception) {
                 Log.i("메시지 보내기 1 에러", e.message.toString())
             }

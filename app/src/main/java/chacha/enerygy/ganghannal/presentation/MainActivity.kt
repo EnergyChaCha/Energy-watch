@@ -21,6 +21,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -71,7 +72,6 @@ class MainActivity : ComponentActivity() {
     private val memberViewModel: MemberViewModel by viewModels()
     private val REQUEST_BODY_SENSORS_PERMISSION = 1
     var permissionAgree = true
-    var haveMemberInfo by mutableStateOf(false)
 
     private var lastNotificationTime: Long = 0
     private val notificationCooldown: Long = 1000 * 60 * 5// 5분 (밀리초 단위)
@@ -106,7 +106,7 @@ class MainActivity : ComponentActivity() {
             } else if(event.path.equals(Order.MEMBER_INFO.name)) {
                 val dataObject = gson.fromJson(dataString, MemberInfo::class.java)
                 Log.i("메시지", "${Order.MEMBER_INFO.name} 겟 ${dataObject.toString()}")
-                haveMemberInfo = true
+                memberViewModel.haveMemberInfo = true
                 memberViewModel.name = dataObject.name
                 memberViewModel.loginId = dataObject.loginId
                 memberViewModel.workArea = dataObject.workArea
@@ -144,7 +144,6 @@ class MainActivity : ComponentActivity() {
             var isMonitoringStarted by remember { mutableStateOf(false) }
             val heartRates = remember { mutableListOf<Float>() }
             val heartRatesToSave = remember { mutableListOf<Float>() }
-            val haveMemberInfoContent = remember{haveMemberInfo}
             messageService = MessageService(context)
 
             // 심박수 업데이트를 처리하는 효과를 생성합니다
@@ -168,37 +167,40 @@ class MainActivity : ComponentActivity() {
 
 
                     // ===== 심박수 저장 로직
-                    // 만약 10초동안의 최빈값이 임계치를 초과했다면 즉시 저장 (저장 후 5분동안 쉬기)
-                    if (heartRate.toInt() != 0 && (heartRate < memberViewModel.minThreshold || heartRate > memberViewModel.maxThreshold)) {
-                        val exceedThreshold = true
+                    if (memberViewModel.haveMemberInfo) {
+                        // 만약 10초동안의 최빈값이 임계치를 초과했다면 즉시 저장 (저장 후 5분동안 쉬기)
+                        if (heartRate.toInt() != 0 && (heartRate < memberViewModel.minThreshold || heartRate > memberViewModel.maxThreshold)) {
+                            val exceedThreshold = true
 
-                        val currentTime = System.currentTimeMillis()
+                            val currentTime = System.currentTimeMillis()
 
-                        // 이전 저장으로부터 5분 지났는지
-                        if (currentTime - lastNotificationTime > notificationCooldown) {
+                            // 이전 저장으로부터 5분 지났는지
+                            if (currentTime - lastNotificationTime > notificationCooldown) {
 //                            Log.i("임계치 초과 심박수 저장 - 임계치 초과 저장", "${heartRate}")
-                            // 알림 전송 코드
-                            saveHeartRate(heartRate, exceedThreshold)
-                            lastNotificationTime = currentTime
-                        } else{
+                                // 알림 전송 코드
+                                saveHeartRate(heartRate, exceedThreshold)
+                                lastNotificationTime = currentTime
+                            } else {
 //                            Log.i("심박수 저장 - 임계치 초과", "아직 시간 안 지남")
+                            }
                         }
-                    }
 
-                    // 2분동안의 최빈값 저장 (0이 아닌 경우에만)
-                    heartRatesToSave.add(newHeartRate)
-                    val secounds = 10
-                    if (heartRatesToSave.size > secounds) {
-                        val mostFrequentHeartRateToSave =
-                            heartRates.groupingBy { it }.eachCount().maxByOrNull { it.value }?.key
-                                ?: 0f
+                        // 2분동안의 최빈값 저장 (0이 아닌 경우에만)
+                        heartRatesToSave.add(newHeartRate)
+                        val secounds = 120
+                        if (heartRatesToSave.size > secounds) {
+                            val mostFrequentHeartRateToSave =
+                                heartRates.groupingBy { it }.eachCount()
+                                    .maxByOrNull { it.value }?.key
+                                    ?: 0f
 
-                        var exceedThreshold = false
-                        if (mostFrequentHeartRateToSave.toInt() != 0 && (mostFrequentHeartRateToSave < memberViewModel.minThreshold || mostFrequentHeartRateToSave > memberViewModel.maxThreshold)) {
-                            exceedThreshold = true
+                            var exceedThreshold = false
+                            if (mostFrequentHeartRateToSave.toInt() != 0 && (mostFrequentHeartRateToSave < memberViewModel.minThreshold || mostFrequentHeartRateToSave > memberViewModel.maxThreshold)) {
+                                exceedThreshold = true
+                            }
+                            saveHeartRate(heartRate, exceedThreshold)
+                            heartRatesToSave.clear()
                         }
-                        saveHeartRate(heartRate, exceedThreshold)
-                        heartRatesToSave.clear()
                     }
                 }
             }
@@ -209,8 +211,7 @@ class MainActivity : ComponentActivity() {
                 memberViewModel,
                 isMonitoringStarted,
                 permissionAgree,
-                messageService,
-                haveMemberInfoContent
+                messageService
             )
         }
     }
@@ -221,6 +222,7 @@ class MainActivity : ComponentActivity() {
     private fun saveHeartRate(heartRate: Float, exceedThreshold: Boolean) {
         if (heartRate.toInt() <= 0) return
         Log.i("심박수 저장", "${heartRate}: 임계치 초과여부 ${exceedThreshold}");
+        messageService.sendMessage(Order.POST_BPM.name, heartRate.toInt().toString())
     }
 
     private fun startHeartRateService() {
@@ -260,8 +262,7 @@ fun MainApp(
     memberViewModel: MemberViewModel,
     isMonitoringStarted: Boolean,
     permissionAgree: Boolean,
-    messageService: MessageService,
-    haveMemberInfo: Boolean
+    messageService: MessageService
 ) {
     GangHanNalTheme {
         Box(
@@ -279,14 +280,21 @@ fun MainApp(
                 composable(NavigationRoute.REPORT.name) { ReportScreen(memberViewModel) }
             }
 
-            Button(onClick = {
-//                messageService.sendMessageToApp("/hello", "안녕 wearos 메시지야 sendMessageToApp")
-//                Log.i("메시지", "전송 완료 sendMessageToApp")
-                messageService.sendMessage("/world", "안녕 나는 wearos에서 보낸 메시지야")
-                Log.i("메시지", "전송 완료")
-            }) {
-                Text(text = "클릭하면 메시지 보냄")
-            }
+//            if (!memberViewModel.haveMemberInfo){
+//                Text(text = "폰에서 로그인을 해주세요.")
+//                messageService.sendMessage(Order.MEMBER_INFO.name, "멤버 인포 주세요")
+//            } else {
+//                Text(text = "로그인 완료!")
+//            }
+
+//            Button(onClick = {
+////                messageService.sendMessageToApp("/hello", "안녕 wearos 메시지야 sendMessageToApp")
+////                Log.i("메시지", "전송 완료 sendMessageToApp")
+//                messageService.sendMessage("/world", "안녕 나는 wearos에서 보낸 메시지야")
+//                Log.i("메시지", "전송 완료")
+//            }) {
+//                Text(text = "클릭하면 메시지 보냄")
+//            }
 
             // 권한
             if (!permissionAgree) {
@@ -347,43 +355,100 @@ fun MainApp(
                 }
             }
 
+            // 로그인
+            if (permissionAgree && !memberViewModel.haveMemberInfo) {
+                val context = LocalContext.current as MainActivity
+                Card(
+                    onClick = { /* 클릭 이벤트 처리 */ },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 4.dp),
+                    backgroundPainter = ColorPainter(MaterialTheme.colors.surface), // 배경 설정
+                    contentColor = MaterialTheme.colors.onSurface,
+                    shape = RoundedCornerShape(8.dp),
+                )
+                {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
 
-            // TODO: 나중에 주석 해제
-//            // 시계 바르게 착용 알림
-//            if (permissionAgree && !isMonitoringStarted) {
-//                Card(
-//                    onClick = { /* 클릭 이벤트 처리 */ },
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(horizontal = 20.dp, vertical = 4.dp),
-//                    backgroundPainter = ColorPainter(MaterialTheme.colors.surface), // 배경 설정
-//                    contentColor = MaterialTheme.colors.onSurface,
-//                    shape = RoundedCornerShape(8.dp)
-//
-//                )
-//                {
-//                    Column(
-////                        horizontalAlignment = Alignment.CenterHorizontally,
-//                        modifier = Modifier.fillMaxWidth()
-//                    ) {
-//                        Text(
-//                            text = "심박수를 측정중입니다.",
-//                            color = AppColor.textWhite.color,
-//                            fontSize = MaterialTheme.typography.body2.fontSize,
-//                        )
-//                        Text(
-//                            text = "10초 정도 소요됩니다.",
-//                            color = AppColor.textWhite.color,
-//                            fontSize = MaterialTheme.typography.body2.fontSize,
-//                        )
-//                        Text(
-//                            text = "워치를 올바르게 착용해 주세요.",
-//                            color = AppColor.textWhite.color,
-//                            fontSize = MaterialTheme.typography.body2.fontSize,
-//                        )
-//                    }
-//                }
-//            }
+                    ) {
+                        Text(
+                            text = "폰에서 로그인을 해주세요.",
+                            color = AppColor.textWhite.color,
+                            fontSize = MaterialTheme.typography.body2.fontSize,
+
+                        )
+                        CompactChip(onClick = {
+                            messageService.sendMessage(Order.MEMBER_INFO.name, "멤버 인포 주세요")
+                        },
+                            colors = ChipDefaults.chipColors(AppColor.primary.color),
+                            label = {
+                                Text(
+                                    text = "로그인 완료",
+                                    color = AppColor.textWhite.color,
+                                    fontSize = MaterialTheme.typography.body2.fontSize,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        CompactChip(onClick = {
+                            // 어플리케이션 종료
+                            context.finish()
+                        },
+                            colors = ChipDefaults.chipColors(AppColor.secondary.color),
+                            label = {
+                                Text(
+                                    text = "종료",
+                                    color = AppColor.textWhite.color,
+                                    fontSize = MaterialTheme.typography.body2.fontSize,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                    }
+                }
+            }
+
+            // 시계 바르게 착용 알림
+            if (permissionAgree && memberViewModel.haveMemberInfo && !isMonitoringStarted) {
+                Card(
+                    onClick = { /* 클릭 이벤트 처리 */ },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 4.dp),
+                    backgroundPainter = ColorPainter(MaterialTheme.colors.surface), // 배경 설정
+                    contentColor = MaterialTheme.colors.onSurface,
+                    shape = RoundedCornerShape(8.dp)
+
+                )
+                {
+                    Column(
+//                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "심박수를 측정중입니다.",
+                            color = AppColor.textWhite.color,
+                            fontSize = MaterialTheme.typography.body2.fontSize,
+                        )
+                        Text(
+                            text = "10초 정도 소요됩니다.",
+                            color = AppColor.textWhite.color,
+                            fontSize = MaterialTheme.typography.body2.fontSize,
+                        )
+                        Text(
+                            text = "워치를 올바르게 착용해 주세요.",
+                            color = AppColor.textWhite.color,
+                            fontSize = MaterialTheme.typography.body2.fontSize,
+                        )
+                    }
+                }
+            }
         }
     }
 }

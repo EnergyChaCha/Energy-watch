@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 
 class MemberViewModel : ViewModel() {
+    var haveMemberInfo by mutableStateOf(false)
 
     var name by mutableStateOf("홍길동")
 
