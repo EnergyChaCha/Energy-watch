@@ -1,7 +1,7 @@
-package chacha.enerygy.ganghannal.presentation.icons
+package chacha.energy.ganghannal.presentation.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
-import chacha.enerygy.ganghannal.presentation.icons.myiconpack.EcgHeart
+import chacha.energy.ganghannal.presentation.icons.myiconpack.EcgHeart
 import kotlin.collections.List as ____KtList
 
 object MyIconPack

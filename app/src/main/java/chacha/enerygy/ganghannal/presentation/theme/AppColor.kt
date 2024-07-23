@@ -1,4 +1,4 @@
-package chacha.enerygy.ganghannal.presentation.theme
+package chacha.energy.ganghannal.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 

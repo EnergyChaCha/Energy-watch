@@ -1,4 +1,4 @@
-package chacha.enerygy.ganghannal.presentation.screen.push
+package chacha.energy.ganghannal.presentation.screen.push
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
-import chacha.enerygy.ganghannal.presentation.theme.AppColor
+import chacha.energy.ganghannal.presentation.theme.AppColor
 import com.google.android.gms.wearable.PutDataMapRequest
 
 

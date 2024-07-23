@@ -1,4 +1,4 @@
-package chacha.enerygy.ganghannal.data.heartrate
+package chacha.energy.ganghannal.data.heartrate
 
 import android.annotation.SuppressLint
 import android.app.Notification
