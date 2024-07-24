@@ -61,10 +61,12 @@ import chacha.energy.ganghannal.presentation.viewmodel.AdminViewModel
 import chacha.energy.ganghannal.presentation.viewmodel.MemberViewModel
 import chacha.enerygy.ganghannal.data.message.dto.Hello
 import chacha.enerygy.ganghannal.data.message.dto.MemberInfo
+import chacha.enerygy.ganghannal.data.message.dto.NotificationItem
 import chacha.enerygy.ganghannal.data.message.dto.Order
 import chacha.enerygy.ganghannal.presentation.viewmodel.NotificationViewModel
 import com.google.android.gms.wearable.Wearable
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 class MainActivity : ComponentActivity() {
     private val adminViewModel: AdminViewModel by viewModels()
@@ -117,6 +119,14 @@ class MainActivity : ComponentActivity() {
                 memberViewModel.minThreshold = dataObject.minThreshold
                 memberViewModel.maxThreshold = dataObject.maxThreshold
                 adminViewModel.isAdmin = dataObject.isAdmin
+            } else if (event.path.equals(Order.GET_ALERT_LIST.name)) {
+                val listType = object : TypeToken<List<NotificationItem>>() {}.type
+                val dataObject: List<NotificationItem> = gson.fromJson(dataString, listType)
+                Log.i("메시지", "${Order.GET_ALERT_LIST.name} 겟 ${dataObject.toString()}")
+                notificationViewModel.thresholdExceedList.clear()
+                for (item in dataObject) {
+                    notificationViewModel.thresholdExceedList.add(item)
+                }
             }
         }
 
@@ -307,7 +317,7 @@ fun MainApp(
             NavHost(navController = navController, startDestination = NavigationRoute.MAIN.name) {
                 composable(NavigationRoute.MAIN.name) { MainScreen(navController, bpm) }
                 composable(NavigationRoute.NOTIFICATION.name) {
-                    PagerScreen(adminViewModel, notificationViewModel)
+                    PagerScreen(adminViewModel, notificationViewModel, messageService)
                 }
                 composable(NavigationRoute.REPORT.name) {
                     ReportScreen(

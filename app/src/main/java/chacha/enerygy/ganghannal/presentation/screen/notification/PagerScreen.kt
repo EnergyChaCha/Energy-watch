@@ -6,12 +6,13 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import chacha.energy.ganghannal.data.message.MessageService
 import chacha.energy.ganghannal.presentation.viewmodel.AdminViewModel
 import chacha.enerygy.ganghannal.presentation.viewmodel.NotificationViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun PagerScreen(adminViewModel: AdminViewModel, notificationViewModel: NotificationViewModel) {
+fun PagerScreen(adminViewModel: AdminViewModel, notificationViewModel: NotificationViewModel, messageService: MessageService) {
     val isAdmin by remember { adminViewModel::isAdmin }
 
     if (isAdmin) {
@@ -20,14 +21,14 @@ fun PagerScreen(adminViewModel: AdminViewModel, notificationViewModel: Notificat
         })
         HorizontalPager(state = pagerState) { page ->
             if (page == 0) {
-                ThresholdExceedListScreen(notificationViewModel, adminViewModel, pagerState)
+                ThresholdExceedListScreen(notificationViewModel, adminViewModel, messageService, pagerState)
             } else {
-                ReportListScreen(notificationViewModel, pagerState)
+                ReportListScreen(notificationViewModel, pagerState, messageService)
             }
         }
     }
     if (!isAdmin) {
-        ThresholdExceedListScreen(notificationViewModel, adminViewModel)
+        ThresholdExceedListScreen(notificationViewModel, adminViewModel, messageService)
     }
 }
 

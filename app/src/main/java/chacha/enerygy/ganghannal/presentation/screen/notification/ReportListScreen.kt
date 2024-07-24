@@ -23,6 +23,7 @@ import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
+import chacha.energy.ganghannal.data.message.MessageService
 import chacha.energy.ganghannal.presentation.component.NotificationItem
 import chacha.energy.ganghannal.presentation.component.PageIndecator
 import chacha.energy.ganghannal.presentation.theme.AppColor
@@ -30,7 +31,7 @@ import chacha.enerygy.ganghannal.presentation.viewmodel.NotificationViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ReportListScreen(notificationViewModel: NotificationViewModel, pagerState: PagerState) {
+fun ReportListScreen(notificationViewModel: NotificationViewModel, pagerState: PagerState, messageService: MessageService) {
     Log.i("알림리스트 신고", "접근")
 
     ScalingLazyColumn(
