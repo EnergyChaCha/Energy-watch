@@ -62,12 +62,14 @@ import chacha.energy.ganghannal.presentation.viewmodel.MemberViewModel
 import chacha.enerygy.ganghannal.data.message.dto.Hello
 import chacha.enerygy.ganghannal.data.message.dto.MemberInfo
 import chacha.enerygy.ganghannal.data.message.dto.Order
+import chacha.enerygy.ganghannal.presentation.viewmodel.NotificationViewModel
 import com.google.android.gms.wearable.Wearable
 import com.google.gson.Gson
 
 class MainActivity : ComponentActivity() {
     private val adminViewModel: AdminViewModel by viewModels()
     private val memberViewModel: MemberViewModel by viewModels()
+    private val notificationViewModel: NotificationViewModel by viewModels()
     private val REQUEST_BODY_SENSORS_PERMISSION = 1
     private val LOCATION_PERMISSION_REQUEST_CODE = 1
     var permissionAgree = true
@@ -227,7 +229,8 @@ class MainActivity : ComponentActivity() {
                 memberViewModel,
                 isMonitoringStarted,
                 permissionAgree,
-                messageService
+                messageService,
+                notificationViewModel
             )
         }
     }
@@ -290,7 +293,8 @@ fun MainApp(
     memberViewModel: MemberViewModel,
     isMonitoringStarted: Boolean,
     permissionAgree: Boolean,
-    messageService: MessageService
+    messageService: MessageService,
+    notificationViewModel: NotificationViewModel
 ) {
     GangHanNalTheme {
         Box(
@@ -303,7 +307,7 @@ fun MainApp(
             NavHost(navController = navController, startDestination = NavigationRoute.MAIN.name) {
                 composable(NavigationRoute.MAIN.name) { MainScreen(navController, bpm) }
                 composable(NavigationRoute.NOTIFICATION.name) {
-                    PagerScreen(adminViewModel)
+                    PagerScreen(adminViewModel, notificationViewModel)
                 }
                 composable(NavigationRoute.REPORT.name) {
                     ReportScreen(

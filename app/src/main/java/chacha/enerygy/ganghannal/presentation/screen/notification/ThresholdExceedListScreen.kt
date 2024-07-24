@@ -1,5 +1,6 @@
 package chacha.energy.ganghannal.presentation.screen.notification
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,10 +26,14 @@ import chacha.energy.ganghannal.presentation.component.NotificationItem
 import chacha.energy.ganghannal.presentation.component.PageIndecator
 import chacha.energy.ganghannal.presentation.theme.AppColor
 import chacha.energy.ganghannal.presentation.viewmodel.AdminViewModel
+import chacha.enerygy.ganghannal.presentation.viewmodel.NotificationViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ThresholdExceedListScreen(adminViewModel: AdminViewModel, pagerState: PagerState? = null) {
+fun ThresholdExceedListScreen(notificationViewModel: NotificationViewModel, adminViewModel: AdminViewModel, pagerState: PagerState? = null) {
+
+    Log.i("알림리스트 신고", "접근")
+
     val isAdmin by remember { adminViewModel::isAdmin }
 
     ScalingLazyColumn(
@@ -70,11 +75,11 @@ fun ThresholdExceedListScreen(adminViewModel: AdminViewModel, pagerState: PagerS
             Triple(0F, "홍*동(wl**)님 심박수가 임계치 미만입니다.", "2024/07/07 09:20")
         )
 
-        items(notifications) { notification ->
+        items(notificationViewModel.thresholdExceedList) { notification ->
             NotificationItem(
-                bpm = notification.first,
-                notification = notification.second,
-                dateTime = notification.third
+                bpm = notification.bpm,
+                notification = notification.message,
+                dateTime = notification.timestamp
             )
         }
     }
