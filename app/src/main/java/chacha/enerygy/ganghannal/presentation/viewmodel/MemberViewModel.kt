@@ -23,5 +23,7 @@ class MemberViewModel : ViewModel() {
 
     var maxThreshold by mutableStateOf(80F)
 
+    var currentBpm by mutableStateOf(0F)
+
 
 }

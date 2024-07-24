@@ -44,7 +44,6 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.Card
 import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.CompactChip
@@ -62,7 +61,6 @@ import chacha.energy.ganghannal.presentation.viewmodel.AdminViewModel
 import chacha.energy.ganghannal.presentation.viewmodel.MemberViewModel
 import chacha.enerygy.ganghannal.data.message.dto.Hello
 import chacha.enerygy.ganghannal.data.message.dto.MemberInfo
-import chacha.enerygy.ganghannal.data.message.dto.Message
 import chacha.enerygy.ganghannal.data.message.dto.Order
 import com.google.android.gms.wearable.Wearable
 import com.google.gson.Gson
@@ -71,11 +69,12 @@ class MainActivity : ComponentActivity() {
     private val adminViewModel: AdminViewModel by viewModels()
     private val memberViewModel: MemberViewModel by viewModels()
     private val REQUEST_BODY_SENSORS_PERMISSION = 1
+    private val LOCATION_PERMISSION_REQUEST_CODE = 1
     var permissionAgree = true
 
     private var lastNotificationTime: Long = 0
     private val notificationCooldown: Long = 1000 * 60 * 5// 5분 (밀리초 단위)
-    private lateinit var  messageService: MessageService
+    private lateinit var messageService: MessageService
 
 
     private val heartRateReceiver = object : BroadcastReceiver() {
@@ -103,7 +102,7 @@ class MainActivity : ComponentActivity() {
             if (event.path.equals(Order.HELLO.name)) {
                 val dataObject = gson.fromJson(dataString, Hello::class.java)
                 Log.i("메시지", "${Order.HELLO.name} 겟 ${dataObject.toString()}")
-            } else if(event.path.equals(Order.MEMBER_INFO.name)) {
+            } else if (event.path.equals(Order.MEMBER_INFO.name)) {
                 val dataObject = gson.fromJson(dataString, MemberInfo::class.java)
                 Log.i("메시지", "${Order.MEMBER_INFO.name} 겟 ${dataObject.toString()}")
                 memberViewModel.haveMemberInfo = true
@@ -134,6 +133,18 @@ class MainActivity : ComponentActivity() {
             permissionAgree = true
         }
 
+        // location 권한 부여
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
+        } else {
+            // 권한이 이미 부여되어 있는 경우
+            Log.i("위치", "권한 부여됨")
+        }
+
 
         // 브로드캐스트 리시버 등록
         registerReceiver(heartRateReceiver, IntentFilter("HeartRateUpdate"))
@@ -160,6 +171,11 @@ class MainActivity : ComponentActivity() {
                     val mostFrequentHeartRate =
                         heartRates.groupingBy { it }.eachCount().maxByOrNull { it.value }?.key ?: 0f
                     heartRate = mostFrequentHeartRate
+
+                    if (heartRate.toInt() != 0) {
+                        memberViewModel.currentBpm = heartRate
+                    }
+
 
                     // 모니터링 여부 반환
                     if (!isMonitoringStarted && heartRate.toInt() > 0) isMonitoringStarted = true
@@ -232,6 +248,18 @@ class MainActivity : ComponentActivity() {
         Log.i("심박수", "startHeartRateService 종료")
     }
 
+//    private fun checkLocationPermission() {
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            ActivityCompat.requestPermissions(
+//                this,
+//                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
+//                LOCATION_PERMISSION_REQUEST_CODE
+//            )
+//        } else {
+//            // 권한이 이미 부여되어 있는 경우
+//            getLocation()
+//        }
+//    }
 
     @Deprecated("Deprecated in Java")
     override fun onRequestPermissionsResult(
@@ -277,7 +305,12 @@ fun MainApp(
                 composable(NavigationRoute.NOTIFICATION.name) {
                     PagerScreen(adminViewModel)
                 }
-                composable(NavigationRoute.REPORT.name) { ReportScreen(memberViewModel) }
+                composable(NavigationRoute.REPORT.name) {
+                    ReportScreen(
+                        memberViewModel,
+                        messageService
+                    )
+                }
             }
 
 //            if (!memberViewModel.haveMemberInfo){
@@ -379,10 +412,11 @@ fun MainApp(
                             color = AppColor.textWhite.color,
                             fontSize = MaterialTheme.typography.body2.fontSize,
 
-                        )
-                        CompactChip(onClick = {
-                            messageService.sendMessage(Order.MEMBER_INFO.name, "멤버 인포 주세요")
-                        },
+                            )
+                        CompactChip(
+                            onClick = {
+                                messageService.sendMessage(Order.MEMBER_INFO.name, "멤버 인포 주세요")
+                            },
                             colors = ChipDefaults.chipColors(AppColor.primary.color),
                             label = {
                                 Text(
@@ -394,10 +428,11 @@ fun MainApp(
                             },
                             modifier = Modifier.fillMaxWidth()
                         )
-                        CompactChip(onClick = {
-                            // 어플리케이션 종료
-                            context.finish()
-                        },
+                        CompactChip(
+                            onClick = {
+                                // 어플리케이션 종료
+                                context.finish()
+                            },
                             colors = ChipDefaults.chipColors(AppColor.secondary.color),
                             label = {
                                 Text(
