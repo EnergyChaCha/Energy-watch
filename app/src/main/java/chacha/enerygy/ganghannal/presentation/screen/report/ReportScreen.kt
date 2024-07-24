@@ -1,8 +1,6 @@
 package chacha.energy.ganghannal.presentation.screen.report
 
 import android.Manifest
-import android.app.Activity
-import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.annotation.RequiresPermission
@@ -27,7 +25,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.CompactChip
 import androidx.wear.compose.material.Icon
@@ -51,6 +48,7 @@ import kotlinx.coroutines.tasks.await
 )
 @Composable
 fun ReportScreen(memberViewModel: MemberViewModel, messageService: MessageService) {
+
 
     val usePreciseLocation = true;
     val permissions = listOf(
@@ -99,24 +97,8 @@ fun ReportScreen(memberViewModel: MemberViewModel, messageService: MessageServic
             CompactChip(onClick = {
                 reportProceed = true
                 Log.i("신고", "버튼 누름")
-                scope.launch(Dispatchers.IO) {
-                    val priority = Priority.PRIORITY_HIGH_ACCURACY
-                    val result = locationClient.getCurrentLocation(
-                        priority,
-                        CancellationTokenSource().token,
-                    ).await()
-
                     var longitude: Double = 0.0
                     var latitude: Double = 0.0
-                    result?.let { fetchedLocation ->
-                        locationInfo =
-                            "Current location is \n" + "lat : ${fetchedLocation.latitude}\n" +
-                                    "long : ${fetchedLocation.longitude}\n" + "fetched at ${System.currentTimeMillis()}"
-                        longitude = fetchedLocation.longitude
-                        latitude = fetchedLocation.latitude
-
-                    }
-
                     val reportdto = ReportDto(memberViewModel.currentBpm, longitude, latitude)
                     Log.i("신고 메시지", reportdto.toString())
                     val messageUtil = MessageUtil();
@@ -126,7 +108,60 @@ fun ReportScreen(memberViewModel: MemberViewModel, messageService: MessageServic
                         Order.POST_REPORT.name,
                         stringData
                     )
-                }
+
+//                if (ActivityCompat.checkSelfPermission(
+//                        context,
+//                        Manifest.permission.ACCESS_FINE_LOCATION
+//                    ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+//                        context,
+//                        Manifest.permission.ACCESS_COARSE_LOCATION
+//                    ) != PackageManager.PERMISSION_GRANTED
+//                ) {
+//                    // 권한 없음
+//                    var longitude: Double = 0.0
+//                    var latitude: Double = 0.0
+//                    val reportdto = ReportDto(memberViewModel.currentBpm, longitude, latitude)
+//                    Log.i("신고 메시지", reportdto.toString())
+//                    val messageUtil = MessageUtil();
+//                    val stringData = messageUtil.makeString(reportdto)
+//
+//                    messageService.sendMessage(
+//                        Order.POST_REPORT.name,
+//                        stringData
+//                    )
+//
+//                } else {
+//                    scope.launch(Dispatchers.IO) {
+//                        val priority = Priority.PRIORITY_HIGH_ACCURACY
+//                        val result = locationClient.getCurrentLocation(
+//                            priority,
+//                            CancellationTokenSource().token,
+//                        ).await()
+//
+//                        var longitude: Double = 0.0
+//                        var latitude: Double = 0.0
+//                        result?.let { fetchedLocation ->
+//                            locationInfo =
+//                                "Current location is \n" + "lat : ${fetchedLocation.latitude}\n" +
+//                                        "long : ${fetchedLocation.longitude}\n" + "fetched at ${System.currentTimeMillis()}"
+//                            longitude = fetchedLocation.longitude
+//                            latitude = fetchedLocation.latitude
+//                            Log.i("위치", locationInfo)
+//
+//                        }
+//
+//                        val reportdto = ReportDto(memberViewModel.currentBpm, longitude, latitude)
+//                        Log.i("신고 메시지", reportdto.toString())
+//                        val messageUtil = MessageUtil();
+//                        val stringData = messageUtil.makeString(reportdto)
+//
+//                        messageService.sendMessage(
+//                            Order.POST_REPORT.name,
+//                            stringData
+//                        )
+//                    }
+//                }
+
             },
                 colors = ChipDefaults.chipColors(AppColor.secondary.color),
                 label = {
