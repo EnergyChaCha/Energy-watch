@@ -28,12 +28,12 @@ android {
             storeFile = file("debug.keystore")
             storePassword = "android"
         }
-        create("release") {
-            keyAlias = "release"
-            keyPassword = "my release key password"
-            storeFile = file("/home/miles/keystore.jks")
-            storePassword = "my keystore password"
-        }
+//        create("release") {
+//            keyAlias = "release"
+//            keyPassword = "my release key password"
+//            storeFile = file("/home/miles/keystore.jks")
+//            storePassword = "my keystore password"
+//        }
     }
 
     buildTypes {
@@ -45,12 +45,12 @@ android {
             )
         }
 
-        getByName("release") {
-            isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            signingConfig = signingConfigs.getByName("release")
-            isDebuggable = false
-        }
+//        getByName("release") {
+//            isMinifyEnabled = false
+//            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+//            signingConfig = signingConfigs.getByName("release")
+//            isDebuggable = false
+//        }
         getByName("debug") {
             signingConfig = signingConfigs.getByName("debug")
             isDebuggable = true
