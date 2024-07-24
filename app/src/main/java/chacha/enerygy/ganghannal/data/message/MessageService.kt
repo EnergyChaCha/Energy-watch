@@ -21,10 +21,10 @@ class MessageService(private val context: Context) {
     private val nodeClient = Wearable.getNodeClient(context)
 
     fun sendMessage(path: String, message: String){
-        val data = message
-        val gson = Gson()
-        val dataJson = gson.toJson(data)
-        val sendData = dataJson.toByteArray(Charsets.UTF_8)
+//        val data = message
+//        val gson = Gson()
+//        val dataJson = gson.toJson(data)
+//        val sendData = dataJson.toByteArray(Charsets.UTF_8)
 
         CoroutineScope(Dispatchers.Default).launch {
             try {
@@ -34,7 +34,7 @@ class MessageService(private val context: Context) {
 //                    Log.i("메시지 보내기 1", message.toString())
 //                }
                 val node = nodes.get(0);
-                val result = Tasks.await(messageClient.sendMessage(node.id, path, message.toByteArray()))
+                val result = Tasks.await(messageClient.sendMessage(node.id, path, message.toByteArray(Charsets.UTF_8)))
                 Log.i("메시지 보내기 1", message.toString())
 
             } catch (e: Exception) {

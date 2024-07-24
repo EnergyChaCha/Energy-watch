@@ -1,44 +1,73 @@
 package chacha.energy.ganghannal.presentation.screen.report
 
+import android.Manifest
+import android.app.Activity
+import android.content.Context
+import android.content.pm.PackageManager
+import android.util.Log
+import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Sos
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.wear.compose.material.Button
-import androidx.wear.compose.material.ButtonDefaults
-import androidx.wear.compose.material.Chip
-import androidx.wear.compose.material.ChipColors
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.CompactChip
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
+import chacha.energy.ganghannal.data.message.MessageService
 import chacha.energy.ganghannal.presentation.theme.AppColor
-import chacha.energy.ganghannal.presentation.viewmodel.AdminViewModel
 import chacha.energy.ganghannal.presentation.viewmodel.MemberViewModel
+import chacha.enerygy.ganghannal.data.message.MessageUtil
+import chacha.enerygy.ganghannal.data.message.dto.Order
+import chacha.enerygy.ganghannal.data.message.dto.ReportDto
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationTokenSource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
+@RequiresPermission(
+    anyOf = [Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION],
+)
 @Composable
-fun ReportScreen(memberViewModel: MemberViewModel) {
+fun ReportScreen(memberViewModel: MemberViewModel, messageService: MessageService) {
+
+    val usePreciseLocation = true;
+    val permissions = listOf(
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_FINE_LOCATION,
+    )
+
+
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val locationClient = remember {
+        LocationServices.getFusedLocationProviderClient(context)
+    }
+    var locationInfo by remember {
+        mutableStateOf("")
+    }
+
     var reportProceed by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -67,7 +96,38 @@ fun ReportScreen(memberViewModel: MemberViewModel) {
                 fontWeight = FontWeight.SemiBold
             )
             Spacer(modifier = Modifier.height(8.dp))
-            CompactChip(onClick = { reportProceed = true },
+            CompactChip(onClick = {
+                reportProceed = true
+                Log.i("신고", "버튼 누름")
+                scope.launch(Dispatchers.IO) {
+                    val priority = Priority.PRIORITY_HIGH_ACCURACY
+                    val result = locationClient.getCurrentLocation(
+                        priority,
+                        CancellationTokenSource().token,
+                    ).await()
+
+                    var longitude: Double = 0.0
+                    var latitude: Double = 0.0
+                    result?.let { fetchedLocation ->
+                        locationInfo =
+                            "Current location is \n" + "lat : ${fetchedLocation.latitude}\n" +
+                                    "long : ${fetchedLocation.longitude}\n" + "fetched at ${System.currentTimeMillis()}"
+                        longitude = fetchedLocation.longitude
+                        latitude = fetchedLocation.latitude
+
+                    }
+
+                    val reportdto = ReportDto(memberViewModel.currentBpm, longitude, latitude)
+                    Log.i("신고 메시지", reportdto.toString())
+                    val messageUtil = MessageUtil();
+                    val stringData = messageUtil.makeString(reportdto)
+
+                    messageService.sendMessage(
+                        Order.POST_REPORT.name,
+                        stringData
+                    )
+                }
+            },
                 colors = ChipDefaults.chipColors(AppColor.secondary.color),
                 label = {
                     Text(
@@ -82,7 +142,7 @@ fun ReportScreen(memberViewModel: MemberViewModel) {
 
         if (reportProceed == true) {
             Spacer(modifier = Modifier.height(8.dp))
-            Row(){
+            Row() {
                 Text(
                     text = "이름 : ",
                     color = AppColor.textWhite.color,
@@ -97,7 +157,7 @@ fun ReportScreen(memberViewModel: MemberViewModel) {
             }
 
 
-            Row(){
+            Row() {
                 Text(
                     text = "아이디 : ",
                     color = AppColor.textWhite.color,
@@ -112,7 +172,7 @@ fun ReportScreen(memberViewModel: MemberViewModel) {
             }
 
 
-            Row(){
+            Row() {
                 Text(
                     text = "생년월일 : ",
                     color = AppColor.textWhite.color,
@@ -139,7 +199,10 @@ fun ReportScreen(memberViewModel: MemberViewModel) {
         }
 
 
-
-
     }
+
+
 }
+
+
+

@@ -86,6 +86,7 @@ dependencies {
     implementation(libs.compose.foundation)
     implementation(libs.activity.compose)
     implementation(libs.core.splashscreen)
+    implementation(libs.play.services.location)
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.ui.test.junit4)
     debugImplementation(libs.ui.tooling)
@@ -106,8 +107,11 @@ dependencies {
     implementation("com.google.guava:guava:31.0.1-android")
     // To use CallbackToFutureAdapter
     implementation("androidx.concurrent:concurrent-futures:1.2.0")
-    // Kotlin
+    // coroutine
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.6.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
 
     // Wearable Data Layer API
     implementation ("com.google.android.gms:play-services-wearable:17.1.0")
