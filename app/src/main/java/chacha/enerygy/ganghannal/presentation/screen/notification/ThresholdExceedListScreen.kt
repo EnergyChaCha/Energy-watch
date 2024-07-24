@@ -34,7 +34,7 @@ import chacha.enerygy.ganghannal.presentation.viewmodel.NotificationViewModel
 @Composable
 fun ThresholdExceedListScreen(notificationViewModel: NotificationViewModel, adminViewModel: AdminViewModel, messageService: MessageService, pagerState: PagerState? = null ) {
 
-    Log.i("알림리스트 신고", "접근")
+    Log.i("알림리스트 임계치", "접근")
     messageService.sendMessage(Order.GET_ALERT_LIST.name, "ThresholdExceedListScreen 임계치 초과 리스트 주세요")
 
     val isAdmin by remember { adminViewModel::isAdmin }

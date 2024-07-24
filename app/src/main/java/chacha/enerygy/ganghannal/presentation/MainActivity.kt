@@ -127,6 +127,23 @@ class MainActivity : ComponentActivity() {
                 for (item in dataObject) {
                     notificationViewModel.thresholdExceedList.add(item)
                 }
+                if (dataObject.size.equals(0)){
+                    notificationViewModel.reportList.add(NotificationItem(0F, "데이터가 존재하지 않습니다.", ""))
+                }
+
+            } else if (event.path.equals(Order.GET_REPORT_LIST.name)) {
+                val listType = object : TypeToken<List<NotificationItem>>() {}.type
+                val dataObject: List<NotificationItem> = gson.fromJson(dataString, listType)
+                Log.i("메시지", "${Order.GET_REPORT_LIST.name} 겟 ${dataObject.toString()}")
+                notificationViewModel.reportList.clear()
+                for (item in dataObject) {
+                    notificationViewModel.reportList.add(item)
+                }
+
+                if (dataObject.size.equals(0)){
+                    notificationViewModel.reportList.add(NotificationItem(0F, "데이터가 존재하지 않습니다.", ""))
+                }
+
             }
         }
 
