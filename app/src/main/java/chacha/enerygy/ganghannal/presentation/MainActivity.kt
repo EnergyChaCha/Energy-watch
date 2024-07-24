@@ -74,7 +74,7 @@ class MainActivity : ComponentActivity() {
     private val notificationViewModel: NotificationViewModel by viewModels()
     private val REQUEST_BODY_SENSORS_PERMISSION = 1
     private val LOCATION_PERMISSION_REQUEST_CODE = 1
-    var permissionAgree = true
+//    var permissionAgree = true
 
     private var lastNotificationTime: Long = 0
     private val notificationCooldown: Long = 1000 * 60 * 5// 5분 (밀리초 단위)
@@ -157,22 +157,23 @@ class MainActivity : ComponentActivity() {
                 arrayOf(Manifest.permission.BODY_SENSORS),
                 REQUEST_BODY_SENSORS_PERMISSION
             )
+
         } else {
             startHeartRateService()
-            permissionAgree = true
+            memberViewModel.sensorPermissionAgree = true
         }
 
-        // location 권한 부여
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
-                LOCATION_PERMISSION_REQUEST_CODE
-            )
-        } else {
-            // 권한이 이미 부여되어 있는 경우
-            Log.i("위치", "권한 부여됨")
-        }
+//        // location 권한 부여
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            ActivityCompat.requestPermissions(
+//                this,
+//                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
+//                LOCATION_PERMISSION_REQUEST_CODE
+//            )
+//        } else {
+//            // 권한이 이미 부여되어 있는 경우
+//            Log.i("위치", "권한 부여됨")
+//        }
 
 
         // 브로드캐스트 리시버 등록
@@ -255,7 +256,6 @@ class MainActivity : ComponentActivity() {
                 adminViewModel,
                 memberViewModel,
                 isMonitoringStarted,
-                permissionAgree,
                 messageService,
                 notificationViewModel
             )
@@ -302,12 +302,12 @@ class MainActivity : ComponentActivity() {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 // 권한이 부여되었으므로 심박수 모니터링을 시작합니다
                 startHeartRateService()
-                permissionAgree = true
+                memberViewModel.sensorPermissionAgree = true
             } else {
                 // 권한이 거부되었을 때의 처리를 합니다
                 // 예를 들어, 사용자에게 권한이 필요하다는 메시지를 표시합니다
                 Log.i("권한", "권한 거부됨")
-                permissionAgree = false
+                memberViewModel.sensorPermissionAgree = false
             }
         }
     }
@@ -319,7 +319,6 @@ fun MainApp(
     adminViewModel: AdminViewModel,
     memberViewModel: MemberViewModel,
     isMonitoringStarted: Boolean,
-    permissionAgree: Boolean,
     messageService: MessageService,
     notificationViewModel: NotificationViewModel
 ) {
@@ -361,7 +360,7 @@ fun MainApp(
 //            }
 
             // 권한
-            if (!permissionAgree) {
+            if (!memberViewModel.sensorPermissionAgree) {
                 val context = LocalContext.current as MainActivity
                 Card(
                     onClick = { /* 클릭 이벤트 처리 */ },
@@ -420,7 +419,7 @@ fun MainApp(
             }
 
             // 로그인
-            if (permissionAgree && !memberViewModel.haveMemberInfo) {
+            if (memberViewModel.sensorPermissionAgree && !memberViewModel.haveMemberInfo) {
                 val context = LocalContext.current as MainActivity
                 Card(
                     onClick = { /* 클릭 이벤트 처리 */ },
@@ -481,7 +480,7 @@ fun MainApp(
             }
 
             // 시계 바르게 착용 알림
-            if (permissionAgree && memberViewModel.haveMemberInfo && !isMonitoringStarted) {
+            if (memberViewModel.sensorPermissionAgree && memberViewModel.haveMemberInfo && !isMonitoringStarted) {
                 Card(
                     onClick = { /* 클릭 이벤트 처리 */ },
                     modifier = Modifier
