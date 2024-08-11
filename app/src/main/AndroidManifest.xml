@@ -56,11 +56,12 @@
             android:permission="android.permission.BODY_SENSORS"/>
 
         <service
-            android:name=".data.cj.StepCounterService"
+            android:name="chacha.enerygy.ganghannal.cj.StepCounterService"
             android:enabled="true"
-            android:exported="true"
+            android:exported="false"
             android:foregroundServiceType="location"
             tools:ignore="ForegroundServicePermission" />
+
     </application>
 
 </manifest>

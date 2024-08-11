@@ -18,10 +18,12 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.Settings
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -56,7 +58,6 @@ import chacha.energy.ganghannal.presentation.viewmodel.AdminViewModel
 import chacha.energy.ganghannal.presentation.viewmodel.MemberViewModel
 import chacha.enerygy.ganghannal.cj.ApiService
 import chacha.enerygy.ganghannal.cj.MyData
-import chacha.enerygy.ganghannal.cj.MyResponse
 import chacha.enerygy.ganghannal.cj.StepCounterService
 import chacha.enerygy.ganghannal.data.message.dto.Hello
 import chacha.enerygy.ganghannal.data.message.dto.MemberInfo
@@ -72,7 +73,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class MainActivity : ComponentActivity(), SensorEventListener {
+class MainActivity : ComponentActivity() {
     private val adminViewModel: AdminViewModel by viewModels()
     private val memberViewModel: MemberViewModel by viewModels()
     private val notificationViewModel: NotificationViewModel by viewModels()
@@ -103,48 +104,6 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
     var onHeartRateUpdate: (Float) -> Unit = {}
 
-
-    private fun startStepCounting() {
-        TODO("Not yet implemented")
-    }
-
-    private val requestPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            if (isGranted) {
-                // 권한이 허용된 경우 Foreground Service 시작
-                startStepCounterService()
-                Log.i("본선 걸음수", "서비스 시작")
-            } else {
-                // 권한이 거부된 경우 사용자에게 안내
-                // 예를 들어, 권한이 필요함을 설명하는 메시지를 보여줄 수 있습니다.
-                Log.i("본선 걸음수", "서비스 거부")
-            }
-        }
-    fun sendPostRequest(data: Int) {
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://server.ganghannal.life/api/cj/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val service = retrofit.create(ApiService::class.java)
-        val data = MyData(data)
-        val call = service.postData(data)
-
-        call.enqueue(object : Callback<Any> {
-
-            override fun onResponse(call: Call<Any>, response: Response<Any>) {
-                if (response.isSuccessful) {
-                    val responseData = response.body()
-                    Log.i("본선 요청","Response: 성공")
-                }
-            }
-
-            override fun onFailure(call: Call<Any>, t: Throwable) {
-                t.printStackTrace()
-                Log.i("본선 요청","실패")
-            }
-        })
-    }
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
@@ -164,7 +123,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
             )
         } else {
             // 권한이 이미 허용된 경우
-            startStepCounter()
+            startStepCounterService()
         }
 
         // SensorManager 초기화 및 걸음 센서 등록
@@ -355,27 +314,6 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         }
     }
 
-    private fun createNotification(): android.app.Notification {
-        val channelId = "step_counter_channel"
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "Step Counter Service",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            val notificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
-
-        return android.app.Notification.Builder(this, channelId)
-            .setContentTitle("Step Counter Service")
-            .setContentText("Counting steps...")
-//            .setSmallIcon(R.drawable.ic_step_counter) // 적절한 아이콘을 사용하세요
-            .build()
-    }
-
-
     // 권한 요청 결과 처리
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -386,7 +324,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         if (requestCode == PERMISSION_REQUEST_ACTIVITY_RECOGNITION) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 // 권한 허용됨
-                startStepCounter()
+                startStepCounterService()
             } else {
                 // 권한 거부됨
                 Log.d("StepCounter", "ACTIVITY_RECOGNITION 권한이 거부되었습니다.")
@@ -395,66 +333,21 @@ class MainActivity : ComponentActivity(), SensorEventListener {
     }
 
     private fun startStepCounterService() {
+        requestIgnoreBatteryOptimizations(this)
         Log.i("본선", "startStepCounterService 함수 시작")
         val intent = Intent(this, StepCounterService::class.java)
         ContextCompat.startForegroundService(this, intent)
         Log.i("본선", "startHeartRateService 종료")
     }
 
-    private fun startStepCounter() {
-        // SensorManager 초기화
-        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-
-        // 걸음 센서 가져오기
-        stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
-
-        // 센서 리스너 등록
-        if (stepSensor != null) {
-            sensorManager.registerListener(
-                this,
-                stepSensor,
-                SensorManager.SENSOR_DELAY_UI // 빠른 데이터 업데이트
-            )
-            Log.d("본선", "걸음 센서 등록 성공")
-
-        } else {
-            Log.d("본선", "걸음 센서를 사용할 수 없습니다.")
-        }
-
-
-        // 5초마다 걸음 수 기록
-        startStepUpdateTask()
-    }
-
-    private fun startStepUpdateTask() {
-        handler.post(object : Runnable {
-            override fun run() {
-                // 현재 걸음 수와 마지막 기록된 걸음 수의 차이를 계산하여 로그에 출력
-                val stepsTaken = steps
-                Log.d("본선 걸음수", "지난 5초 동안 걸음 수: $stepsTaken")
-                sendPostRequest(stepsTaken)
-                // 5초 후에 다시 실행
-                handler.postDelayed(this, stepUpdateInterval)
-            }
-        })
-    }
-
-    override fun onSensorChanged(event: SensorEvent?) {
-        event?.let {
-            steps = it.values[0].toInt() // 걸음 수 업데이트
-            Log.i("본선 걸음수", steps.toString())
+    private fun requestIgnoreBatteryOptimizations(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+            intent.data = Uri.parse("package:" + context.packageName)
+            context.startActivity(intent)
         }
     }
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        // 정확도 변경 시 처리 (필요시 구현)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        sensorManager.unregisterListener(this) // 리스너 해제
-        Log.i("본선 걸음수", "리스너 디스트로이")
-    }
 
 //    /**
 //     * 2분 동안의 심박 수 중 최빈값 서버에 저장
